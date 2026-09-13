@@ -593,18 +593,29 @@
           else el.classList.add('hidden');
         });
 
-        // Sinkronisasi data cabang dahulu agar cache terisi
+        // 1. Ambil data cabang terlebih dahulu
         await sinkronisasiCacheCabang();
 
-        // Tampilkan pilihan cabang di layar POS khusus Owner/Super Owner
+        // 2. Tampilkan dan isi pilihan cabang di layar POS khusus Owner/Super Owner
         const branchWrapper = document.getElementById('pos-branch-selector-wrapper');
         const selectPosBranch = document.getElementById('pos-branch-active');
         
         if (isOwner) {
           branchWrapper.classList.remove('hidden');
           branchWrapper.classList.add('flex');
+          
           selectPosBranch.innerHTML = '';
-          window.daftarCabangCache.forEach(b => {
+          
+          // Jika cache dari database kosong, gunakan fallback agar tetap muncul
+          let listCabang = window.daftarCabangCache;
+          if (!listCabang || listCabang.length === 0) {
+            listCabang = [
+              { code: 'SOP', name: 'Soppeng' },
+              { code: 'MAK', name: 'Makassar' }
+            ];
+          }
+
+          listCabang.forEach(b => {
             if (b.code !== 'ALL') {
               selectPosBranch.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`;
             }
