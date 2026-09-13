@@ -1099,8 +1099,15 @@
     }
 
     function initLaporanDefault() {
-      const today = new Date().toISOString().split('T')[0];
-      document.getElementById('filter-tgl-mulai').value = today; document.getElementById('filter-tgl-selesai').value = today;
+      // Mengambil tanggal hari ini berdasarkan zona waktu lokal dengan format YYYY-MM-DD yang aman
+      const now = new Date();
+      const year = now.getFullYear();
+      const month = String(now.getMonth() + 1).padStart(2, '0');
+      const day = String(now.getDate()).padStart(2, '0');
+      const today = `${year}-${month}-${day}`;
+
+      document.getElementById('filter-tgl-mulai').value = today; 
+      document.getElementById('filter-tgl-selesai').value = today;
       jalankanFilterLaporan();
     }
 
