@@ -127,8 +127,17 @@
       <!-- TAB 1: LAYAR KASIR (POS) -->
       <div id="tab-pos" class="h-full flex flex-col lg:flex-row gap-4 p-4 overflow-hidden">
         <div class="flex-1 glass rounded-[2rem] p-5 flex flex-col overflow-hidden shadow-2xl">
-          <h2 class="text-base font-bold mb-4 text-white border-b border-indigo-500/30 pb-3 flex items-center justify-between">
+          <h2 class="text-base font-bold mb-4 text-white border-b border-indigo-500/30 pb-3 flex flex-wrap items-center justify-between gap-3">
             <span class="flex items-center gap-2 text-cyan-400"><i class="fa-solid fa-layer-group"></i><span class="text-white">Pilih Menu</span></span>
+            
+            <!-- PILIHAN CABANG KHUSUS OWNER/SUPER OWNER DI LAYAR POS -->
+            <div id="pos-branch-selector-wrapper" class="hidden items-center gap-2">
+              <span class="text-xs text-indigo-300 uppercase font-semibold">Cabang Transaksi:</span>
+              <select id="pos-branch-active" class="bg-indigo-950/80 border border-cyan-500/40 rounded-xl px-3 py-1.5 text-white text-xs font-bold focus:outline-none focus:border-cyan-400">
+                <!-- Diisi via JavaScript -->
+              </select>
+            </div>
+
             <span id="info-jml-menu" class="text-sm text-indigo-300 font-medium bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-500/30">0 item</span>
           </h2>
           
@@ -577,14 +586,36 @@
         loginScreen.classList.add('hidden'); 
         appScreen.classList.remove('hidden');
         
-        if(currentUserData.role !== 'OWNER' && currentUserData.role !== 'SUPER_OWNER') {
-          document.querySelectorAll('.menu-owner').forEach(el => el.classList.add('hidden'));
+        const isOwner = (currentUserData.role === 'OWNER' || currentUserData.role === 'SUPER_OWNER');
+        
+        document.querySelectorAll('.menu-owner').forEach(el => {
+          if(isOwner) el.classList.remove('hidden');
+          else el.classList.add('hidden');
+        });
+
+        // Sinkronisasi data cabang dahulu agar cache terisi
+        await sinkronisasiCacheCabang();
+
+        // Tampilkan pilihan cabang di layar POS khusus Owner/Super Owner
+        const branchWrapper = document.getElementById('pos-branch-selector-wrapper');
+        const selectPosBranch = document.getElementById('pos-branch-active');
+        
+        if (isOwner) {
+          branchWrapper.classList.remove('hidden');
+          branchWrapper.classList.add('flex');
+          selectPosBranch.innerHTML = '';
+          window.daftarCabangCache.forEach(b => {
+            if (b.code !== 'ALL') {
+              selectPosBranch.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`;
+            }
+          });
         } else {
-          document.querySelectorAll('.menu-owner').forEach(el => el.classList.remove('hidden'));
+          branchWrapper.classList.add('hidden');
+          branchWrapper.classList.remove('flex');
         }
+
         window.bukaTab('pos'); 
         muatData();
-        sinkronisasiCacheCabang();
         initLaporanDefault();
       } else {
         loginScreen.classList.remove('hidden'); 
@@ -649,6 +680,7 @@
         await catatAudit("CREATE_BRANCH", "branch", kode, `Menambahkan cabang ${nama} (${kode})`);
         document.getElementById('form-cabang').reset();
         tampilkanPesan("Berhasil", "Cabang berhasil disimpan!", "success");
+        await sinkronisasiCacheCabang();
         muatDaftarCabang();
       } catch (error) { tampilkanPesan("Gagal", "Gagal menyimpan cabang: " + error.message, "error"); }
     }
@@ -1002,7 +1034,17 @@
       if(window.metodePilih === 'TUNAI' && diterima < total) { tampilkanPesan("Peringatan", "Uang yang diterima kurang!", "error"); return; }
 
       try {
-        const branchCode = currentUserData.branch_id || "SOP"; 
+        // Tentukan cabang berdasarkan akun (kasir) atau dropdown POS (jika owner)
+        let branchCode = currentUserData.branch_id;
+        const isOwner = (currentUserData.role === 'OWNER' || currentUserData.role === 'SUPER_OWNER');
+        if (isOwner) {
+          const selectPosBranch = document.getElementById('pos-branch-active');
+          if (selectPosBranch && selectPosBranch.value) {
+            branchCode = selectPosBranch.value;
+          }
+        }
+        if (!branchCode || branchCode === 'ALL') branchCode = 'SOP';
+
         const todayStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
         
         const { count } = await supabaseClient.from('transactions').select('*', { count: 'exact', head: true }).like('transactionNumber', `${branchCode}-${todayStr}-%`);
@@ -1026,8 +1068,7 @@
         const { data, error } = await supabaseClient.from('transactions').insert([transaksiBaru]).select();
         if (error) throw error;
 
-        // --- TAMBAHAN LOG TRANSAKSI ---
-        await catatAudit("CREATE_TRANSACTION", "transaction", data[0].id, `Melakukan transaksi ${transactionNumber} sebesar Rp ${total.toLocaleString('id-ID')}`);
+        await catatAudit("CREATE_TRANSACTION", "transaction", data[0].id, `Melakukan transaksi ${transactionNumber} di cabang ${branchCode} sebesar Rp ${total.toLocaleString('id-ID')}`);
 
         tutupModalPembayaran(); 
         tampilkanStruk(transaksiBaru); 
@@ -1103,7 +1144,6 @@
       const tglMulaiEl = document.getElementById('filter-tgl-mulai');
       const tglSelesaiEl = document.getElementById('filter-tgl-selesai');
       
-      // Cek apakah elemen input tanggal sudah ada di DOM
       if (tglMulaiEl && tglSelesaiEl && !tglMulaiEl.value) {
         const now = new Date();
         const year = now.getFullYear();
