@@ -620,9 +620,12 @@
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
         await supabaseClient.from('auditLogs').insert([{
-          userId: session ? session.user.id : "system",
-          userName: currentUserData ? currentUserData.name : "Unknown",
-          action, targetType, targetId: String(targetId || ''), detail
+          "userId": session ? session.user.id : "system",
+          "userName": currentUserData ? currentUserData.name : "Unknown",
+          action, 
+          "targetType": targetType, 
+          "targetId": String(targetId || ''), 
+          detail
         }]);
       } catch (e) { console.error("Gagal mencatat log:", e); }
     }
