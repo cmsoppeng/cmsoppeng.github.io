@@ -318,23 +318,20 @@
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-file-lines text-cyan-400"></i>Laporan Penjualan</h2>
         <p class="text-indigo-300 text-sm mb-6">Filter dan analisis data transaksi historis untuk seluruh cabang.</p>
 
-        <div class="glass p-5 rounded-[2rem] mb-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 items-end shadow-xl">
+        <div class="glass p-5 rounded-[2rem] mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end shadow-xl">
           <div>
             <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Dari Tanggal</label>
-            <input type="date" id="filter-tgl-mulai" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
+            <input type="date" id="filter-tgl-mulai" onchange="jalankanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
           </div>
           <div>
             <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Sampai Tanggal</label>
-            <input type="date" id="filter-tgl-selesai" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
+            <input type="date" id="filter-tgl-selesai" onchange="jalankanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
           </div>
           <div>
             <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Cabang</label>
-            <select id="filter-cabang" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400">
+            <select id="filter-cabang" onchange="jalankanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400">
               <option value="ALL">Semua Cabang</option>
             </select>
-          </div>
-          <div>
-            <button onclick="jalankanFilterLaporan()" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 px-4 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)] flex justify-center items-center gap-2"><i class="fa-solid fa-filter"></i>Tampilkan</button>
           </div>
         </div>
 
@@ -366,7 +363,7 @@
               </tr>
             </thead>
             <tbody id="tabel-laporan-body" class="divide-y divide-indigo-500/20">
-              <tr><td colspan="6" class="text-center text-indigo-400 py-8">Silakan klik tombol Tampilkan...</td></tr>
+              <tr><td colspan="6" class="text-center text-indigo-400 py-8">Memuat data laporan...</td></tr>
             </tbody>
           </table>
         </div>
@@ -593,10 +590,10 @@
           else el.classList.add('hidden');
         });
 
-        // 1. Ambil data cabang terlebih dahulu
+        // Sinkronisasi data cabang dahulu agar cache terisi
         await sinkronisasiCacheCabang();
 
-        // 2. Tampilkan dan isi pilihan cabang di layar POS khusus Owner/Super Owner
+        // Tampilkan pilihan cabang di layar POS khusus Owner/Super Owner
         const branchWrapper = document.getElementById('pos-branch-selector-wrapper');
         const selectPosBranch = document.getElementById('pos-branch-active');
         
@@ -605,8 +602,6 @@
           branchWrapper.classList.add('flex');
           
           selectPosBranch.innerHTML = '';
-          
-          // Jika cache dari database kosong, gunakan fallback agar tetap muncul
           let listCabang = window.daftarCabangCache;
           if (!listCabang || listCabang.length === 0) {
             listCabang = [
@@ -1045,7 +1040,6 @@
       if(window.metodePilih === 'TUNAI' && diterima < total) { tampilkanPesan("Peringatan", "Uang yang diterima kurang!", "error"); return; }
 
       try {
-        // Tentukan cabang berdasarkan akun (kasir) atau dropdown POS (jika owner)
         let branchCode = currentUserData.branch_id;
         const isOwner = (currentUserData.role === 'OWNER' || currentUserData.role === 'SUPER_OWNER');
         if (isOwner) {
@@ -1144,7 +1138,16 @@
     function muatDropdownCabangLaporan() {
       const select = document.getElementById('filter-cabang'); 
       select.innerHTML = '<option value="ALL">Semua Cabang</option>';
-      window.daftarCabangCache.forEach(b => { 
+      
+      let listCabang = window.daftarCabangCache;
+      if (!listCabang || listCabang.length === 0) {
+        listCabang = [
+          { code: 'SOP', name: 'Soppeng' },
+          { code: 'MAK', name: 'Makassar' }
+        ];
+      }
+
+      listCabang.forEach(b => { 
         if (b.code !== 'ALL') {
           select.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`; 
         }
@@ -1173,7 +1176,7 @@
       const tglSelesai = document.getElementById('filter-tgl-selesai').value; 
       const cabang = document.getElementById('filter-cabang').value;
       
-      if(!tglMulai || !tglSelesai) { tampilkanPesan("Peringatan", "Silakan pilih rentang tanggal.", "error"); return; }
+      if(!tglMulai || !tglSelesai) { return; }
 
       const tbody = document.getElementById('tabel-laporan-body');
       tbody.innerHTML = `<tr><td colspan="6" class="text-center text-indigo-400 py-8">Memproses data...</td></tr>`;
@@ -1188,14 +1191,10 @@
 
         data.forEach(trx => {
           const trxDate = new Date(trx.created_at);
-          
-          // Periksa rentang tanggal
           if(trxDate >= start && trxDate <= end) {
-            // Normalisasi kode cabang untuk memastikan perbandingan akurat (mengabaikan perbedaan kapital/spasi)
             const trxBranch = (trx.branch_id || 'SOP').trim().toUpperCase();
             const filterBranch = (cabang || 'ALL').trim().toUpperCase();
 
-            // Cocokkan apakah 'ALL' atau sama persis dengan kode cabang transaksi
             if(filterBranch === 'ALL' || trxBranch === filterBranch) {
               totalTrx += 1; 
               totalRp += Number(trx.total || 0);
