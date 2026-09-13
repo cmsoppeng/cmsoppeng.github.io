@@ -560,7 +560,7 @@
       if(tabName === 'laporan') { muatDropdownCabangLaporan(); initLaporanDefault(); }
     }
 
-    // Cek Sesi Login Supabase
+    // Cek Sesi Login Supabase dengan Validasi Tabel Users
     async function cekSesi() {
       const loginScreen = document.getElementById('login-screen');
       const appScreen = document.getElementById('app-screen');
@@ -569,9 +569,18 @@
       
       if (session) {
         const user = session.user;
-        const { data: userDoc } = await supabaseClient.from('users').select('*').eq('email', user.email).single();
+        const { data: userDoc, error } = await supabaseClient.from('users').select('*').eq('email', user.email).single();
         
-        currentUserData = userDoc || { role: "OWNER", branch_id: "SOP", name: "Owner", id: user.id };
+        if (error || !userDoc || userDoc.active === false) {
+          await supabaseClient.auth.signOut();
+          currentUserData = null;
+          loginScreen.classList.remove('hidden'); 
+          appScreen.classList.add('hidden');
+          tampilkanPesan("Akses Ditolak", "Akun Anda telah dinonaktifkan atau dihapus dari sistem.", "error");
+          return;
+        }
+        
+        currentUserData = userDoc;
         document.getElementById('user-role-badge').innerText = `${currentUserData.role} • CABANG ${currentUserData.branch_id || 'SOP'}`;
         
         loginScreen.classList.add('hidden'); 
@@ -604,6 +613,15 @@
       
       errBox.classList.add('hidden');
       btn.innerText = "Memproses..."; btn.disabled = true;
+      
+      // Validasi ganda ke tabel users database sebelum proses auth
+      const { data: userCheck } = await supabaseClient.from('users').select('*').eq('email', email).single();
+      if (!userCheck || userCheck.active === false) {
+        errBox.classList.remove('hidden');
+        errBox.innerText = "Gagal masuk: Akun tidak ditemukan atau sudah dihapus dari sistem.";
+        btn.innerText = "Masuk Sistem"; btn.disabled = false;
+        return;
+      }
       
       const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
       
