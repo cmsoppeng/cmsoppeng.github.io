@@ -1183,13 +1183,23 @@
         if (error) throw error;
 
         let totalTrx = 0; let totalRp = 0; let htmlRows = '';
-        const start = new Date(tglMulai + "T00:00:00"); const end = new Date(tglSelesai + "T23:59:59");
+        const start = new Date(tglMulai + "T00:00:00"); 
+        const end = new Date(tglSelesai + "T23:59:59");
 
         data.forEach(trx => {
           const trxDate = new Date(trx.created_at);
+          
+          // Periksa rentang tanggal
           if(trxDate >= start && trxDate <= end) {
-            if(cabang === 'ALL' || trx.branch_id === cabang) {
-              totalTrx += 1; totalRp += Number(trx.total || 0);
+            // Normalisasi kode cabang untuk memastikan perbandingan akurat (mengabaikan perbedaan kapital/spasi)
+            const trxBranch = (trx.branch_id || 'SOP').trim().toUpperCase();
+            const filterBranch = (cabang || 'ALL').trim().toUpperCase();
+
+            // Cocokkan apakah 'ALL' atau sama persis dengan kode cabang transaksi
+            if(filterBranch === 'ALL' || trxBranch === filterBranch) {
+              totalTrx += 1; 
+              totalRp += Number(trx.total || 0);
+              
               htmlRows += `
                 <tr class="hover:bg-indigo-900/30 transition">
                   <td class="py-4 font-mono text-cyan-400">${trx.transactionNumber}</td>
