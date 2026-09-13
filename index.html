@@ -619,13 +619,13 @@
     async function catatAudit(action, targetType, targetId, detail) {
       try {
         const { data: { session } } = await supabaseClient.auth.getSession();
-        await supabaseClient.from('auditLogs').insert([{
-          "userId": session ? session.user.id : "system",
-          "userName": currentUserData ? currentUserData.name : "Unknown",
-          action, 
-          "targetType": targetType, 
-          "targetId": String(targetId || ''), 
-          detail
+        await supabaseClient.from('auditlogs').insert([{
+          userid: session ? session.user.id : "system",
+          username: currentUserData ? currentUserData.name : "Unknown",
+          action: action,
+          targettype: targetType,
+          targetid: String(targetId || ''),
+          detail: detail
         }]);
       } catch (e) { console.error("Gagal mencatat log:", e); }
     }
@@ -714,7 +714,7 @@
         } else {
           const { error } = await supabaseClient.from('users').update({ name: nama, role, branch_id }).eq('id', editId);
           if (error) throw error;
-          await catatAudit("UPDATE_USER", "user", editId, `Mengubah data akaun ${nama} (${role} - ${branch_id})`);
+          await catatAudit("UPDATE_USER", "user", editId, `Mengubah data akun ${nama} (${role} - ${branch_id})`);
           tampilkanPesan("Sukses", "Data akun berhasil diperbarui!", "success");
         }
 
