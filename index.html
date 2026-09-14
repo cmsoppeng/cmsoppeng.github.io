@@ -953,12 +953,35 @@
       window.dataMenuAsli.forEach(menu => {
         const fmtRp = new Intl.NumberFormat('id-ID').format(menu.price);
         const iconClass = getSmartIcon(menu.name, menu.category);
-        const mediaCard = menu.imageUrl ? `<img src="${menu.imageUrl}" class="w-12 h-12 rounded-xl object-cover border border-indigo-500/40">` : `<div class="text-cyan-400 text-3xl"><i class="${iconClass}"></i></div>`;
+        
+        // PENGAMAN OTOMATIS (FALLBACK): 
+        // Jika link gambar gagal dimuat (onerror), otomatis sembunyikan gambar & tampilkan ikon cerdas
+        let mediaCard = '';
+        if (menu.imageUrl && menu.imageUrl.trim() !== '') {
+          // Tangani otomatis link Google Drive view agar menjadi direct link jika memungkinkan
+          let finalImgUrl = menu.imageUrl.trim();
+          if (finalImgUrl.includes('drive.google.com/file/d/')) {
+            const fileIdMatch = finalImgUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
+            if (fileIdMatch && fileIdMatch[1]) {
+              finalImgUrl = `https://lh3.googleusercontent.com/d/${fileIdMatch[1]}`;
+            }
+          }
+
+          mediaCard = `
+            <div class="relative w-12 h-12">
+              <img src="${finalImgUrl}" class="w-12 h-12 rounded-xl object-cover border border-indigo-500/40 relative z-10" onerror="this.style.display='none'; this.nextElementSibling.style.display='flex';">
+              <div class="w-12 h-12 rounded-xl border border-indigo-500/40 bg-indigo-950/50 text-cyan-400 text-xl items-center justify-center absolute inset-0 z-0" style="display: none;"><i class="${iconClass}"></i></div>
+            </div>`;
+        } else {
+          mediaCard = `<div class="text-cyan-400 text-3xl flex items-center justify-center w-12 h-12"><i class="${iconClass}"></i></div>`;
+        }
+
         const htmlCard = `
           <button onclick="tambahKeKeranjang('${menu.id}')" class="glass-card rounded-[2rem] p-5 hover:border-cyan-400/60 transition text-left flex flex-col justify-between min-h-[9rem] active:scale-95 group relative overflow-hidden">
             <div class="flex justify-between items-start w-full relative z-10">${mediaCard}<div class="text-cyan-200 font-bold text-sm bg-indigo-950/40 px-2.5 py-1 rounded-xl border border-indigo-500/30">${fmtRp}</div></div>
             <div class="font-bold text-white text-sm sm:text-base leading-snug group-hover:text-cyan-300 relative z-10 mt-auto">${menu.name}</div>
           </button>`;
+          
         const cat = (menu.category || '').toLowerCase();
         if (cat.includes('minum')) gridMinuman.innerHTML += htmlCard; else if (cat.includes('tambah')) gridTambahan.innerHTML += htmlCard; else gridMakanan.innerHTML += htmlCard;
       });
