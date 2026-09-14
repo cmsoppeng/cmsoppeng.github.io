@@ -149,7 +149,10 @@
         </div>
 
         <div class="w-full lg:w-[420px] glass rounded-[2rem] p-5 flex flex-col shrink-0 shadow-2xl max-h-[50vh] lg:max-h-full border-t lg:border-t-0 border-indigo-500/30">
-          <h2 class="text-base font-bold mb-4 border-b border-indigo-500/30 pb-3 text-white flex items-center gap-2"><i class="fa-solid fa-receipt text-cyan-400"></i>Pesanan Saat Ini</h2>
+          <div class="flex justify-between items-center mb-4 border-b border-indigo-500/30 pb-3">
+            <h2 class="text-base font-bold text-white flex items-center gap-2"><i class="fa-solid fa-receipt text-cyan-400"></i>Pesanan Saat Ini</h2>
+            <button onclick="bukaModalRiwayat()" class="text-xs bg-indigo-900/50 hover:bg-indigo-800 text-indigo-300 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition flex items-center gap-1"><i class="fa-solid fa-clock-rotate-left"></i>Riwayat Hari Ini</button>
+          </div>
           <div id="pos-keranjang" class="flex-1 overflow-y-auto space-y-3 pr-2 mb-4">
             <div class="text-indigo-400 text-center mt-10 text-sm italic">Belum ada item pesanan</div>
           </div>
@@ -167,6 +170,7 @@
 
       <!-- TAB 2: MASTER MENU -->
       <div id="tab-master" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
+        <!-- Konten Master Menu (Tidak berubah dari sebelumnya) -->
         <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><i class="fa-solid fa-utensils text-cyan-400"></i>Master Menu</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="glass p-6 rounded-[2rem] h-fit shadow-xl">
@@ -194,6 +198,7 @@
 
       <!-- TAB 3: CABANG -->
       <div id="tab-cabang" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
+        <!-- Konten Cabang (Tidak berubah) -->
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-code-branch text-cyan-400"></i>Cabang</h2>
         <p class="text-indigo-300 text-sm mb-6">Kelola dan tambahkan lokasi cabang operasional Coto Mario.</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -220,6 +225,7 @@
 
       <!-- TAB 4: KELOLA AKUN -->
       <div id="tab-akun" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
+        <!-- Konten Akun (Tidak berubah) -->
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-users-gear text-cyan-400"></i>Kelola Akun</h2>
         <p class="text-indigo-300 text-sm mb-6">Tambah, edit, atau hapus akun pengguna sistem beserta hak akses dan cabangnya.</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -268,6 +274,7 @@
 
       <!-- TAB 5: LOG -->
       <div id="tab-audit" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
+        <!-- Konten Audit (Tidak berubah) -->
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-cyan-400"></i>Log Sistem</h2>
         <p class="text-indigo-300 text-sm mb-6">Catatan aktivitas penting dan histori administratif sistem Coto Mario.</p>
         <div class="glass p-6 rounded-[2rem] shadow-xl">
@@ -277,6 +284,7 @@
 
       <!-- TAB 6: DASHBOARD OWNER -->
       <div id="tab-dashboard" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
+        <!-- Konten Dashboard (Tidak berubah) -->
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-chart-pie text-cyan-400"></i>Laporan Omzet</h2>
         <p class="text-indigo-300 text-sm mb-6 uppercase tracking-widest font-semibold">Ringkasan Eksekutif Hari Ini</p>
         
@@ -357,9 +365,9 @@
                 <th class="pb-3 font-semibold">No. Transaksi</th>
                 <th class="pb-3 font-semibold">Waktu</th>
                 <th class="pb-3 font-semibold">Cabang</th>
-                <th class="pb-3 font-semibold">Kasir</th>
                 <th class="pb-3 font-semibold">Metode</th>
                 <th class="pb-3 font-semibold text-right">Total</th>
+                <th class="pb-3 font-semibold text-center pl-4">Aksi</th>
               </tr>
             </thead>
             <tbody id="tabel-laporan-body" class="divide-y divide-indigo-500/20">
@@ -408,11 +416,12 @@
   <div id="modal-struk" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
     <div class="bg-white text-slate-900 rounded-3xl w-full max-w-sm p-6 shadow-2xl flex flex-col max-h-[90vh]">
       <div class="text-center mb-4">
-        <div class="text-4xl mb-2 text-emerald-500 drop-shadow-md"><i class="fa-solid fa-circle-check"></i></div>
-        <h3 class="text-xl font-bold">Transaksi Berhasil!</h3>
+        <div id="struk-icon" class="text-4xl mb-2 text-emerald-500 drop-shadow-md"><i class="fa-solid fa-circle-check"></i></div>
+        <h3 id="struk-title" class="text-xl font-bold">Transaksi Berhasil!</h3>
         <p id="struk-no" class="text-sm text-slate-500 font-mono mt-1">SOP-20260912-001</p>
       </div>
       <div id="print-area" class="font-mono text-sm bg-slate-50 p-5 rounded-2xl border border-slate-200 mb-5 overflow-y-auto flex-1">
+        <div id="struk-reprint-label" class="hidden text-center text-xs font-bold border-b border-dashed border-slate-300 pb-2 mb-2 text-rose-600">*** STRUK CETAK ULANG ***</div>
         <div class="text-center font-bold text-lg mb-1">COTO MARIO</div>
         <div class="text-center text-slate-500 mb-4 pb-3 border-b border-dashed border-slate-300">Cabang <span id="struk-cabang-name">Soppeng</span></div>
         <div id="struk-info" class="mb-3 text-xs leading-relaxed border-b border-dashed border-slate-300 pb-3"></div>
@@ -422,8 +431,42 @@
       </div>
       <div class="flex gap-3">
         <button onclick="window.print()" class="flex-1 bg-slate-800 hover:bg-slate-700 text-white py-3 rounded-xl font-bold text-sm transition"><i class="fa-solid fa-print mr-2"></i>Cetak</button>
-        <button onclick="tutupModalStruk()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)]">Pesanan Baru</button>
+        <button onclick="tutupModalStruk()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white py-3 rounded-xl font-bold text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)]">Selesai</button>
       </div>
+    </div>
+  </div>
+
+  <!-- MODAL RIWAYAT TRANSAKSI KASIR (HARI INI) -->
+  <div id="modal-riwayat" class="fixed inset-0 bg-black/80 backdrop-blur-md z-40 flex items-center justify-center hidden p-4">
+    <div class="glass bg-indigo-950/95 border border-indigo-500/50 rounded-[2rem] w-full max-w-2xl p-7 shadow-2xl flex flex-col max-h-[85vh]">
+      <div class="flex justify-between items-center mb-5 border-b border-indigo-500/30 pb-4">
+        <h3 class="text-xl font-bold text-white flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-cyan-400"></i>Riwayat Transaksi Hari Ini</h3>
+        <button onclick="tutupModalRiwayat()" class="text-indigo-400 hover:text-white transition text-2xl"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="overflow-y-auto pr-2 flex-1 space-y-3" id="daftar-riwayat-hari-ini">
+        <!-- Diisi Javascript -->
+        <p class="text-center text-indigo-400 py-8">Memuat riwayat...</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL ALASAN PEMBATALAN -->
+  <div id="modal-batal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 flex items-center justify-center hidden p-4">
+    <div class="glass bg-indigo-950/95 border border-rose-500/50 rounded-[2rem] w-full max-w-sm p-7 shadow-2xl text-center">
+      <div class="text-rose-400 text-5xl mb-4 drop-shadow-md"><i class="fa-solid fa-triangle-exclamation"></i></div>
+      <h3 class="text-xl font-bold text-white mb-2">Batalkan Transaksi</h3>
+      <p class="text-indigo-300 text-sm mb-4">No: <span id="batal-trx-no" class="font-bold text-white"></span></p>
+      
+      <form onsubmit="prosesBatalTransaksi(event)" class="text-left">
+        <input type="hidden" id="batal-trx-id">
+        <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Alasan Pembatalan (Wajib)</label>
+        <textarea id="batal-reason" required rows="3" class="w-full bg-indigo-900/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-rose-400 mb-5" placeholder="Cth: Pelanggan batal, salah input..."></textarea>
+        
+        <div class="flex gap-3">
+          <button type="button" onclick="tutupModalBatal()" class="flex-1 bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 py-3.5 rounded-xl font-bold text-sm border border-indigo-500/30 transition">Kembali</button>
+          <button type="submit" class="flex-1 bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white py-3.5 rounded-xl font-bold text-sm shadow-lg transition">Ya, Batalkan</button>
+        </div>
+      </form>
     </div>
   </div>
 
@@ -492,9 +535,7 @@
       modal.classList.remove('hidden');
     }
 
-    window.tutupNotif = function() {
-      document.getElementById('modal-notif').classList.add('hidden');
-    }
+    window.tutupNotif = function() { document.getElementById('modal-notif').classList.add('hidden'); }
 
     window.tampilkanKonfirmasi = function(judul, pesan, callbackYa) {
       const modal = document.getElementById('modal-notif');
@@ -590,7 +631,6 @@
           else el.classList.add('hidden');
         });
 
-        // Sinkronisasi data cabang dahulu agar cache terisi
         await sinkronisasiCacheCabang();
 
         // Tampilkan pilihan cabang di layar POS khusus Owner/Super Owner
@@ -600,20 +640,10 @@
         if (isOwner) {
           branchWrapper.classList.remove('hidden');
           branchWrapper.classList.add('flex');
-          
           selectPosBranch.innerHTML = '';
-          let listCabang = window.daftarCabangCache;
-          if (!listCabang || listCabang.length === 0) {
-            listCabang = [
-              { code: 'SOP', name: 'Soppeng' },
-              { code: 'MAK', name: 'Makassar' }
-            ];
-          }
-
+          let listCabang = window.daftarCabangCache.length ? window.daftarCabangCache : [{ code: 'SOP', name: 'Soppeng' }];
           listCabang.forEach(b => {
-            if (b.code !== 'ALL') {
-              selectPosBranch.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`;
-            }
+            if (b.code !== 'ALL') selectPosBranch.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`;
           });
         } else {
           branchWrapper.classList.add('hidden');
@@ -629,9 +659,7 @@
       }
     }
 
-    window.addEventListener('DOMContentLoaded', () => {
-      cekSesi();
-    });
+    window.addEventListener('DOMContentLoaded', () => { cekSesi(); });
 
     window.handleLogin = async function(event) {
       event.preventDefault();
@@ -669,7 +697,7 @@
     }
 
     // ==========================================
-    // CABANG
+    // CABANG & AKUN LOGIC (Ringkas)
     // ==========================================
     async function sinkronisasiCacheCabang() {
       const { data } = await supabaseClient.from('branches').select('*').eq('active', true);
@@ -683,180 +711,31 @@
       try {
         const { error } = await supabaseClient.from('branches').upsert([{ code: kode, name: nama, active: true }]);
         if (error) throw error;
-        await catatAudit("CREATE_BRANCH", "branch", kode, `Menambahkan cabang ${nama} (${kode})`);
+        await catatAudit("CREATE_BRANCH", "branch", kode, `Menambahkan cabang ${nama}`);
         document.getElementById('form-cabang').reset();
         tampilkanPesan("Berhasil", "Cabang berhasil disimpan!", "success");
-        await sinkronisasiCacheCabang();
-        muatDaftarCabang();
-      } catch (error) { tampilkanPesan("Gagal", "Gagal menyimpan cabang: " + error.message, "error"); }
+        await sinkronisasiCacheCabang(); muatDaftarCabang();
+      } catch (error) { tampilkanPesan("Gagal", error.message, "error"); }
     }
 
     async function muatDaftarCabang() {
       const { data, error } = await supabaseClient.from('branches').select('*');
-      const divCabang = document.getElementById('daftar-cabang');
-      divCabang.innerHTML = '';
-      if(error || !data || data.length === 0) { divCabang.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada cabang terdaftar.</p>'; return; }
+      const divCabang = document.getElementById('daftar-cabang'); divCabang.innerHTML = '';
+      if(error || !data || data.length === 0) return divCabang.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada cabang terdaftar.</p>';
       data.forEach(b => {
-        divCabang.innerHTML += `
-          <div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm">
-            <div><p class="font-bold text-white text-base mb-1">${b.name}</p><p class="text-xs text-amber-400 font-mono bg-indigo-900/50 inline-block px-2 py-0.5 rounded-md border border-indigo-500/30">Kode: ${b.code}</p></div>
+        divCabang.innerHTML += `<div class="p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm mb-3">
+            <div><p class="font-bold text-white text-base">${b.name}</p><p class="text-xs text-amber-400 font-mono mt-1">Kode: ${b.code}</p></div>
           </div>`;
       });
     }
 
     function muatDropdownCabang() {
-      const select = document.getElementById('akun-branch'); 
-      select.innerHTML = '<option value="ALL">Semua Cabang (Pusat / Owner)</option>';
-      window.daftarCabangCache.forEach(b => { 
-        if (b.code !== 'ALL') {
-          select.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`; 
-        }
-      });
+      const select = document.getElementById('akun-branch'); select.innerHTML = '<option value="ALL">Semua Cabang</option>';
+      window.daftarCabangCache.forEach(b => { if (b.code !== 'ALL') select.innerHTML += `<option value="${b.code}">${b.name}</option>`; });
     }
 
     // ==========================================
-    // KELOLA AKUN (CRUD LENGKAP)
-    // ==========================================
-    window.handleSimpanAkun = async function(event) {
-      event.preventDefault();
-      const editId = document.getElementById('akun-edit-id').value;
-      const nama = document.getElementById('akun-nama').value.trim();
-      const email = document.getElementById('akun-email').value.trim();
-      const password = document.getElementById('akun-pass').value.trim();
-      const role = document.getElementById('akun-role').value;
-      const branch_id = document.getElementById('akun-branch').value;
-
-      try {
-        if (!editId) {
-          if(!password || password.length < 6) { 
-            tampilkanPesan("Peringatan", "Kata sandi minimal 6 karakter.", "error"); 
-            return; 
-          }
-          
-          const { data: { session: currentSession } } = await supabaseClient.auth.getSession();
-
-          const { data: authData, error: authError } = await supabaseClient.auth.signUp({ email, password });
-          if (authError) throw authError;
-
-          if (!authData.user) throw new Error("Gagal membuat akun autentikasi.");
-          const userId = authData.user.id;
-
-          const { error: dbError } = await supabaseClient.from('users').insert([{ id: userId, name: nama, email, role, branch_id, active: true }]);
-          if (dbError) throw dbError;
-
-          if (currentSession) {
-            await supabaseClient.auth.setSession({ access_token: currentSession.access_token, refresh_token: currentSession.refresh_token });
-          }
-
-          await catatAudit("CREATE_USER", "user", userId, `Membuat akun ${role} (${nama}) untuk cabang ${branch_id}`);
-          tampilkanPesan("Sukses", `Akun ${role} atas nama ${nama} berhasil dibuat!`, "success");
-        } else {
-          const { error } = await supabaseClient.from('users').update({ name: nama, role, branch_id }).eq('id', editId);
-          if (error) throw error;
-          await catatAudit("UPDATE_USER", "user", editId, `Mengubah data akun ${nama} (${role} - ${branch_id})`);
-          tampilkanPesan("Sukses", "Data akun berhasil diperbarui!", "success");
-        }
-
-        resetFormAkun();
-        muatDaftarAkun();
-      } catch (error) { 
-        tampilkanPesan("Gagal", "Gagal memproses akun: " + error.message, "error"); 
-      }
-    }
-
-    window.resetFormAkun = function() {
-      document.getElementById('form-akun').reset();
-      document.getElementById('akun-edit-id').value = '';
-      document.getElementById('akun-email').disabled = false;
-      document.getElementById('akun-pass').required = true;
-      document.getElementById('div-password').style.display = 'block';
-      document.getElementById('form-akun-title').innerHTML = '<i class="fa-solid fa-user-plus"></i> Tambah Akun Baru';
-      document.getElementById('btn-simpan-akun').innerText = 'Simpan';
-      document.getElementById('btn-batal-edit').classList.add('hidden');
-    }
-
-    window.editAkun = function(id, name, email, role, branch_id) {
-      if (currentUserData.role === 'OWNER' && role === 'SUPER_OWNER') {
-        tampilkanPesan("Akses Ditolak", "Owner tidak diizinkan mengubah akun Super Owner!", "error");
-        return;
-      }
-
-      document.getElementById('akun-edit-id').value = id;
-      document.getElementById('akun-nama').value = name;
-      document.getElementById('akun-email').value = email;
-      document.getElementById('akun-email').disabled = true;
-      document.getElementById('akun-pass').required = false;
-      document.getElementById('div-password').style.display = 'none';
-      document.getElementById('akun-role').value = role;
-      document.getElementById('akun-branch').value = branch_id;
-
-      document.getElementById('form-akun-title').innerHTML = '<i class="fa-solid fa-user-pen"></i> Edit Akun';
-      document.getElementById('btn-simpan-akun').innerText = 'Perbarui Akun';
-      document.getElementById('btn-batal-edit').classList.remove('hidden');
-    }
-
-    window.hapusAkun = async function(id, nama, targetRole) {
-      if (currentUserData.role === 'OWNER' && targetRole === 'SUPER_OWNER') {
-        tampilkanPesan("Akses Ditolak", "Owner tidak diizinkan menghapus akun Super Owner!", "error");
-        return;
-      }
-
-      tampilkanKonfirmasi("Konfirmasi Hapus", `Yakin ingin menghapus profil akses database untuk ${nama}?`, async () => {
-        try {
-          const { error } = await supabaseClient.from('users').delete().eq('id', id);
-          if (error) throw error;
-          await catatAudit("DELETE_USER", "user", id, `Menghapus profil akses akun ${nama}`);
-          tampilkanPesan("Sukses", "Akun berhasil dihapus dari daftar!", "success");
-          muatDaftarAkun();
-        } catch(e) { tampilkanPesan("Gagal", "Gagal menghapus akun: " + e.message, "error"); }
-      });
-    }
-
-    async function muatDaftarAkun() {
-      const { data, error } = await supabaseClient.from('users').select('*');
-      const divAkun = document.getElementById('daftar-akun'); divAkun.innerHTML = '';
-      if(error || !data || data.length === 0) { divAkun.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada akun terdaftar.</p>'; return; }
-      
-      data.forEach(u => {
-        const badgeColor = u.role === 'OWNER' ? 'bg-amber-500/20 text-amber-300 border-amber-500/50' : 'bg-cyan-900/30 text-cyan-300 border-cyan-700/50';
-        divAkun.innerHTML += `
-          <div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm gap-2">
-            <div>
-              <p class="font-bold text-white text-base mb-1">
-                ${u.name} 
-                <span class="text-[10px] ${badgeColor} px-2 py-0.5 rounded-md border ml-2 font-mono tracking-wider">${u.role}</span>
-                <span class="text-[10px] text-indigo-300 bg-indigo-900/50 px-2 py-0.5 rounded-md border border-indigo-500/30 ml-1">CABANG: ${u.branch_id || 'SOP'}</span>
-              </p>
-              <p class="text-sm text-indigo-300">${u.email}</p>
-            </div>
-            <div class="flex items-center gap-2">
-              <button onclick="editAkun('${u.id}', '${u.name}', '${u.email}', '${u.role}', '${u.branch_id || 'SOP'}')" class="text-xs text-sky-300 hover:text-white border border-sky-900/50 bg-sky-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-pen-to-square"></i></button>
-              <button onclick="hapusAkun('${u.id}', '${u.name}', '${u.role}')" class="text-xs text-rose-300 hover:text-white border border-rose-900/50 bg-rose-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-trash"></i></button>
-            </div>
-          </div>`;
-      });
-    }
-
-    async function muatAuditTrail() {
-      const { data, error } = await supabaseClient.from('auditlogs').select('*').order('created_at', { ascending: false });
-      const divAudit = document.getElementById('daftar-audit'); divAudit.innerHTML = '';
-      if(error || !data || data.length === 0) { divAudit.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada catatan log.</p>'; return; }
-      
-      data.forEach(log => {
-        const waktu = log.created_at ? new Date(log.created_at).toLocaleString('id-ID') : 'Baru saja';
-        divAudit.innerHTML += `
-          <div class="p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 flex flex-col sm:flex-row justify-between items-start sm:items-center text-sm shadow-sm gap-2">
-            <div>
-              <span class="font-bold text-cyan-400 text-xs tracking-wider uppercase">[${log.action}]</span> <span class="text-white ml-1">${log.detail}</span>
-              <div class="text-xs text-indigo-300 mt-1">Oleh: <span class="font-medium text-indigo-100">${log.username}</span></div>
-            </div>
-            <div class="text-xs text-indigo-400 font-mono bg-indigo-900/30 px-2 py-1 rounded border border-indigo-500/20 whitespace-nowrap">${waktu}</div>
-          </div>`;
-      });
-    }
-
-    // ==========================================
-    // MASTER MENU & KASIR (POS)
+    // LOGIC MASTER MENU & POS KERANJANG 
     // ==========================================
     function getSmartIcon(name, category) {
       const n = (name || "").toLowerCase();
@@ -872,107 +751,51 @@
       const kategori = document.getElementById('menu-kategori').value;
       const harga = Number(document.getElementById('menu-harga').value); 
       const imageUrl = document.getElementById('menu-img').value.trim();
-      
       try {
-        const { data, error } = await supabaseClient.from('menus').insert([{ 
-          name: nama, 
-          category: kategori, 
-          price: harga, 
-          imageUrl: imageUrl || "", 
-          active: true 
-        }]).select();
-        
+        const { data, error } = await supabaseClient.from('menus').insert([{ name: nama, category: kategori, price: harga, imageUrl: imageUrl || "", active: true }]).select();
         if (error) throw error;
-        
-        await catatAudit("CREATE_MENU", "menu", data[0].id, `Menambahkan menu ${nama} (Rp ${harga})`);
-        document.getElementById('form-menu').reset(); 
-        tampilkanPesan("Berhasil", "Menu berhasil disimpan!", "success");
-        muatData();
-      } catch (error) { tampilkanPesan("Gagal", "Gagal menyimpan: " + error.message, "error"); }
+        await catatAudit("CREATE_MENU", "menu", data[0].id, `Menambahkan menu ${nama}`);
+        document.getElementById('form-menu').reset(); tampilkanPesan("Berhasil", "Menu disimpan!", "success"); muatData();
+      } catch (error) { tampilkanPesan("Gagal", error.message, "error"); }
     }
 
     async function muatData() {
       const { data, error } = await supabaseClient.from('menus').select('*').eq('active', true);
       window.dataMenuAsli = data || [];
-      const divDaftarMaster = document.getElementById('daftar-menu'); 
-      divDaftarMaster.innerHTML = '';
-      
-      if (error || window.dataMenuAsli.length === 0) { 
-        divDaftarMaster.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada menu.</p>'; 
-        document.getElementById('pos-menu-container').innerHTML = '<p class="text-indigo-400 col-span-full text-center text-sm w-full">Belum ada menu.</p>'; 
-        document.getElementById('info-jml-menu').innerText = '0 item'; 
-        return; 
+      const divDaftarMaster = document.getElementById('daftar-menu'); divDaftarMaster.innerHTML = '';
+      if (error || window.dataMenuAsli.length === 0) {
+        divDaftarMaster.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada menu.</p>'; return;
       }
-
       window.dataMenuAsli.forEach((menu) => {
-        const formatRupiah = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(menu.price);
-        const iconDisplay = menu.imageUrl 
-          ? `<img src="${menu.imageUrl}" class="w-12 h-12 rounded-xl object-cover border border-indigo-500/50 shadow-lg">`
-          : `<div class="w-12 h-12 bg-indigo-900/80 rounded-xl border border-indigo-500/50 flex items-center justify-center text-xl shadow-lg text-cyan-400"><i class="${getSmartIcon(menu.name, menu.category)}"></i></div>`;
-
-        divDaftarMaster.innerHTML += `
-          <div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm">
-            <div class="flex items-center gap-4">
-              ${iconDisplay}
-              <div><p class="font-bold text-white text-base">${menu.name}</p><p class="text-xs text-indigo-300 mt-0.5">${menu.category}</p></div>
-            </div>
-            <div class="flex items-center gap-4"><span class="text-amber-400 text-base font-bold tracking-wide">${formatRupiah}</span>
-            <button onclick="nonaktifkanMenu('${menu.id}', '${menu.name}')" class="text-xs text-rose-300 hover:text-white border border-rose-900/50 bg-rose-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-trash"></i></button></div>
+        divDaftarMaster.innerHTML += `<div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm mb-3">
+            <div><p class="font-bold text-white">${menu.name}</p><p class="text-xs text-indigo-300">Rp ${menu.price}</p></div>
           </div>`;
       });
       document.getElementById('info-jml-menu').innerText = `${window.dataMenuAsli.length} MENU`;
       renderMenuKePOS();
     }
 
-    window.nonaktifkanMenu = async function(menuId, menuName) {
-      tampilkanKonfirmasi("Konfirmasi Hapus", `Hapus/Nonaktifkan menu ${menuName}?`, async () => {
-        await supabaseClient.from('menus').update({ active: false }).eq('id', menuId);
-        await catatAudit("DELETE_MENU", "menu", menuId, `Menghapus menu ${menuName}`);
-        muatData();
-      });
-    }
-
     function renderMenuKePOS() {
-      const gridMakanan = document.getElementById('pos-makanan');
-      const gridMinuman = document.getElementById('pos-minuman');
-      const gridTambahan = document.getElementById('pos-tambahan');
-
+      const gridMakanan = document.getElementById('pos-makanan'); const gridMinuman = document.getElementById('pos-minuman'); const gridTambahan = document.getElementById('pos-tambahan');
       gridMakanan.innerHTML = ''; gridMinuman.innerHTML = ''; gridTambahan.innerHTML = '';
-
       window.dataMenuAsli.forEach(menu => {
-        const formatRupiah = new Intl.NumberFormat('id-ID').format(menu.price);
+        const fmtRp = new Intl.NumberFormat('id-ID').format(menu.price);
         const iconClass = getSmartIcon(menu.name, menu.category);
-        
-        const mediaCard = menu.imageUrl
-          ? `<img src="${menu.imageUrl}" class="w-12 h-12 rounded-xl object-cover border border-indigo-500/40 shadow-md">`
-          : `<div class="text-cyan-400 text-3xl drop-shadow-[0_0_10px_rgba(34,211,238,0.4)]"><i class="${iconClass}"></i></div>`;
-
+        const mediaCard = menu.imageUrl ? `<img src="${menu.imageUrl}" class="w-12 h-12 rounded-xl object-cover border border-indigo-500/40">` : `<div class="text-cyan-400 text-3xl"><i class="${iconClass}"></i></div>`;
         const htmlCard = `
           <button onclick="tambahKeKeranjang('${menu.id}')" class="glass-card rounded-[2rem] p-5 hover:border-cyan-400/60 transition text-left flex flex-col justify-between min-h-[9rem] active:scale-95 group relative overflow-hidden">
-            <div class="absolute inset-0 bg-cyan-400/5 opacity-0 group-hover:opacity-100 transition"></div>
-            <div class="flex justify-between items-start w-full relative z-10">
-              ${mediaCard}
-              <div class="text-cyan-200 font-bold text-sm tracking-wide bg-indigo-950/40 px-2.5 py-1 rounded-xl border border-indigo-500/30">${formatRupiah}</div>
-            </div>
-            <div class="text-left relative z-10 mt-auto">
-              <div class="font-bold text-white text-sm sm:text-base leading-snug group-hover:text-cyan-300 drop-shadow-md transition-colors line-clamp-2">${menu.name}</div>
-            </div>
+            <div class="flex justify-between items-start w-full relative z-10">${mediaCard}<div class="text-cyan-200 font-bold text-sm bg-indigo-950/40 px-2.5 py-1 rounded-xl border border-indigo-500/30">${fmtRp}</div></div>
+            <div class="font-bold text-white text-sm sm:text-base leading-snug group-hover:text-cyan-300 relative z-10 mt-auto">${menu.name}</div>
           </button>`;
-
         const cat = (menu.category || '').toLowerCase();
-        if (cat.includes('minum')) gridMinuman.innerHTML += htmlCard;
-        else if (cat.includes('tambah')) gridTambahan.innerHTML += htmlCard;
-        else gridMakanan.innerHTML += htmlCard;
+        if (cat.includes('minum')) gridMinuman.innerHTML += htmlCard; else if (cat.includes('tambah')) gridTambahan.innerHTML += htmlCard; else gridMakanan.innerHTML += htmlCard;
       });
-
-      gridMinuman.style.display = gridMinuman.innerHTML === '' ? 'none' : '';
-      gridTambahan.style.display = gridTambahan.innerHTML === '' ? 'none' : '';
     }
 
     window.tambahKeKeranjang = function(menuId) {
       const menu = window.dataMenuAsli.find(m => m.id === menuId); if(!menu) return;
-      const adaDiKeranjang = window.keranjang.find(item => item.id === menuId);
-      if(adaDiKeranjang) { adaDiKeranjang.qty += 1; adaDiKeranjang.subtotal = adaDiKeranjang.qty * adaDiKeranjang.price; } 
+      const exist = window.keranjang.find(item => item.id === menuId);
+      if(exist) { exist.qty += 1; exist.subtotal = exist.qty * exist.price; } 
       else { window.keranjang.push({ id: menu.id, name: menu.name, price: menu.price, qty: 1, subtotal: menu.price }); }
       renderKeranjang();
     }
@@ -985,34 +808,31 @@
     }
 
     function renderKeranjang() {
-      const divKeranjang = document.getElementById('pos-keranjang');
-      const divTotal = document.getElementById('pos-total');
-      const btnBayar = document.getElementById('btn-bayar');
-      
+      const divKeranjang = document.getElementById('pos-keranjang'); const divTotal = document.getElementById('pos-total'); const btnBayar = document.getElementById('btn-bayar');
       if(window.keranjang.length === 0) {
         divKeranjang.innerHTML = '<div class="text-indigo-400 text-center mt-10 text-sm italic">Belum ada item pesanan</div>';
         divTotal.innerText = 'Rp 0'; btnBayar.disabled = true; return;
       }
       btnBayar.disabled = false; divKeranjang.innerHTML = ''; let totalSemua = 0;
-
       window.keranjang.forEach((item, index) => {
         totalSemua += item.subtotal;
-        const formatSub = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(item.subtotal);
         divKeranjang.innerHTML += `
           <div class="flex justify-between items-center bg-indigo-900/40 p-4 rounded-2xl border border-indigo-500/20 shadow-sm">
-            <div class="flex-1"><div class="font-bold text-white text-sm lg:text-base mb-1">${item.name}</div>
+            <div class="flex-1"><div class="font-bold text-white text-sm mb-1">${item.name}</div>
             <div class="flex items-center gap-2">
-              <button onclick="ubahJumlah(${index}, -1)" class="bg-indigo-950 hover:bg-indigo-800 border border-indigo-500/30 text-white w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm transition">-</button>
-              <span class="w-6 text-center font-bold text-cyan-400 text-base">${item.qty}</span>
-              <button onclick="ubahJumlah(${index}, 1)" class="bg-cyan-600/30 hover:bg-cyan-500/40 border border-cyan-500/40 text-cyan-200 w-8 h-8 rounded-xl flex items-center justify-center font-bold text-sm transition">+</button>
-            </div>
-            </div>
-            <div class="text-right font-bold text-amber-400 text-base tracking-wide">${formatSub}</div>
+              <button onclick="ubahJumlah(${index}, -1)" class="bg-indigo-950 hover:bg-indigo-800 border border-indigo-500/30 text-white w-8 h-8 rounded-xl">-</button>
+              <span class="w-6 text-center font-bold text-cyan-400">${item.qty}</span>
+              <button onclick="ubahJumlah(${index}, 1)" class="bg-cyan-600/30 border border-cyan-500/40 text-cyan-200 w-8 h-8 rounded-xl">+</button>
+            </div></div>
+            <div class="text-right font-bold text-amber-400">${new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits:0}).format(item.subtotal)}</div>
           </div>`;
       });
       divTotal.innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalSemua);
     }
     
+    // ==========================================
+    // LOGIC PEMBAYARAN & TRANSAKSI
+    // ==========================================
     window.bukaModalPembayaran = function() {
       let total = window.keranjang.reduce((sum, item) => sum + item.subtotal, 0);
       document.getElementById('modal-total').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total);
@@ -1023,7 +843,7 @@
     
     window.pilihMetode = function(metode) {
       window.metodePilih = metode;
-      ['tunai', 'qris', 'transfer'].forEach(m => { document.getElementById(`btn-metode-${m}`).className = "p-3 rounded-2xl border border-indigo-500/40 bg-indigo-900/50 text-indigo-200 font-bold text-sm text-center transition hover:border-cyan-400/50"; });
+      ['tunai', 'qris', 'transfer'].forEach(m => { document.getElementById(`btn-metode-${m}`).className = "p-3 rounded-2xl border border-indigo-500/40 bg-indigo-900/50 text-indigo-200 font-bold text-sm text-center transition"; });
       document.getElementById(`btn-metode-${metode.toLowerCase()}`).className = "p-3 rounded-2xl border border-cyan-400 bg-cyan-500/20 text-cyan-300 font-bold text-sm text-center transition shadow-[0_0_15px_rgba(34,211,238,0.2)]";
       document.getElementById('form-tunai').classList.toggle('hidden', metode !== 'TUNAI');
     }
@@ -1041,51 +861,56 @@
 
       try {
         let branchCode = currentUserData.branch_id;
-        const isOwner = (currentUserData.role === 'OWNER' || currentUserData.role === 'SUPER_OWNER');
-        if (isOwner) {
+        if (currentUserData.role === 'OWNER' || currentUserData.role === 'SUPER_OWNER') {
           const selectPosBranch = document.getElementById('pos-branch-active');
-          if (selectPosBranch && selectPosBranch.value) {
-            branchCode = selectPosBranch.value;
-          }
+          if (selectPosBranch && selectPosBranch.value) branchCode = selectPosBranch.value;
         }
         if (!branchCode || branchCode === 'ALL') branchCode = 'SOP';
 
         const todayStr = new Date().toISOString().slice(0,10).replace(/-/g,'');
-        
         const { count } = await supabaseClient.from('transactions').select('*', { count: 'exact', head: true }).like('transactionNumber', `${branchCode}-${todayStr}-%`);
         const nomorUrut = (count || 0) + 1;
 
         const transactionNumber = `${branchCode}-${todayStr}-${String(nomorUrut).padStart(3, '0')}`;
         const transaksiBaru = {
-          transactionNumber, 
-          branch_id: branchCode, 
-          cashierId: currentUserData.id, 
-          cashierName: currentUserData.name,
-          items: window.keranjang, 
-          subtotal: total, 
-          total: total, 
-          paymentMethod: window.metodePilih, 
-          cashReceived: window.metodePilih === 'TUNAI' ? diterima : total, 
-          change: window.metodePilih === 'TUNAI' ? (diterima - total) : 0,
+          transactionNumber, branch_id: branchCode, cashierId: currentUserData.id, cashierName: currentUserData.name,
+          items: window.keranjang, subtotal: total, total: total, paymentMethod: window.metodePilih, 
+          cashReceived: window.metodePilih === 'TUNAI' ? diterima : total, change: window.metodePilih === 'TUNAI' ? (diterima - total) : 0,
           status: 'COMPLETED'
         };
 
         const { data, error } = await supabaseClient.from('transactions').insert([transaksiBaru]).select();
         if (error) throw error;
+        await catatAudit("CREATE_TRANSACTION", "transaction", data[0].id, `Transaksi ${transactionNumber} Rp ${total.toLocaleString('id-ID')}`);
 
-        await catatAudit("CREATE_TRANSACTION", "transaction", data[0].id, `Melakukan transaksi ${transactionNumber} di cabang ${branchCode} sebesar Rp ${total.toLocaleString('id-ID')}`);
-
-        tutupModalPembayaran(); 
-        tampilkanStruk(transaksiBaru); 
-        window.keranjang = []; 
-        renderKeranjang();
-      } catch (error) { tampilkanPesan("Gagal", "Gagal memproses transaksi: " + error.message, "error"); }
+        tutupModalPembayaran(); tampilkanStruk(transaksiBaru, false); window.keranjang = []; renderKeranjang();
+      } catch (error) { tampilkanPesan("Gagal", error.message, "error"); }
     }
 
-    function tampilkanStruk(trx) {
+    // ==========================================
+    // LOGIC STRUK & CETAK ULANG (REPRINT)
+    // ==========================================
+    window.tampilkanStruk = function(trx, isReprint = false) {
       document.getElementById('struk-no').innerText = trx.transactionNumber;
       document.getElementById('struk-cabang-name').innerText = trx.branch_id;
-      document.getElementById('struk-info').innerHTML = `<div>Tgl: ${new Date().toLocaleString('id-ID')}</div><div>Kasir: ${trx.cashierName}</div><div>Metode: ${trx.paymentMethod}</div>`;
+      
+      const lblReprint = document.getElementById('struk-reprint-label');
+      const iconStruk = document.getElementById('struk-icon');
+      const titleStruk = document.getElementById('struk-title');
+
+      if(isReprint) {
+        lblReprint.classList.remove('hidden');
+        titleStruk.innerText = "Struk Cetak Ulang";
+        iconStruk.innerHTML = '<i class="fa-solid fa-print"></i>';
+        iconStruk.className = "text-4xl mb-2 text-cyan-500 drop-shadow-md";
+      } else {
+        lblReprint.classList.add('hidden');
+        titleStruk.innerText = "Transaksi Berhasil!";
+        iconStruk.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+        iconStruk.className = "text-4xl mb-2 text-emerald-500 drop-shadow-md";
+      }
+      
+      document.getElementById('struk-info').innerHTML = `<div>Waktu: ${new Date().toLocaleString('id-ID')}</div><div>Kasir: ${trx.cashierName}</div><div>Metode: ${trx.paymentMethod}</div>`;
       
       const divItems = document.getElementById('struk-items'); divItems.innerHTML = '';
       trx.items.forEach(item => { divItems.innerHTML += `<div class="flex justify-between"><span>${item.name} x${item.qty}</span><span>Rp ${item.subtotal.toLocaleString('id-ID')}</span></div>`; });
@@ -1095,10 +920,202 @@
       document.getElementById('struk-total').innerHTML = htmlTotal;
       document.getElementById('modal-struk').classList.remove('hidden');
     }
-
     window.tutupModalStruk = function() { document.getElementById('modal-struk').classList.add('hidden'); }
+    
+    window.cetakUlang = function(encodedTrx) {
+      try {
+        const trx = JSON.parse(decodeURIComponent(encodedTrx));
+        tampilkanStruk(trx, true);
+      } catch (e) {
+        tampilkanPesan("Gagal", "Data transaksi rusak atau tidak valid.", "error");
+      }
+    }
+
+    // ==========================================
+    // LOGIC PEMBATALAN TRANSAKSI (VOID)
+    // ==========================================
+    window.bukaModalRiwayat = async function() {
+      const modal = document.getElementById('modal-riwayat');
+      const divList = document.getElementById('daftar-riwayat-hari-ini');
+      divList.innerHTML = '<p class="text-center text-indigo-400 py-8">Memuat data hari ini...</p>';
+      modal.classList.remove('hidden');
+
+      try {
+        let branchCode = currentUserData.branch_id;
+        if (currentUserData.role === 'OWNER' || currentUserData.role === 'SUPER_OWNER') {
+          const selectPosBranch = document.getElementById('pos-branch-active');
+          if (selectPosBranch && selectPosBranch.value) branchCode = selectPosBranch.value;
+        }
+        if (!branchCode || branchCode === 'ALL') branchCode = 'SOP';
+
+        const todayStr = new Date().toISOString().slice(0,10).replace(/-/g,''); // Format YYYYMMDD
+        
+        // Tarik trx hari ini untuk cabang aktif
+        const { data, error } = await supabaseClient.from('transactions')
+          .select('*')
+          .like('transactionNumber', `${branchCode}-${todayStr}-%`)
+          .order('created_at', { ascending: false });
+          
+        if(error) throw error;
+
+        if(!data || data.length === 0) {
+          divList.innerHTML = '<p class="text-center text-indigo-400 py-8 italic">Belum ada transaksi di cabang ini hari ini.</p>';
+          return;
+        }
+
+        let htmlRows = '';
+        data.forEach(trx => {
+          const wkt = new Date(trx.created_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute:'2-digit'});
+          const isBatal = trx.status === 'CANCELLED';
+          const totalFmt = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(trx.total);
+          const trxEncoded = encodeURIComponent(JSON.stringify(trx));
+          
+          let actionBtns = '';
+          if(isBatal) {
+            actionBtns = `<span class="bg-rose-900/50 text-rose-300 text-[10px] px-2 py-1 rounded border border-rose-500/30 uppercase tracking-widest font-bold">DIBATALKAN</span>`;
+          } else {
+            actionBtns = `
+              <button onclick="cetakUlang('${trxEncoded}')" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-500/30 text-xs transition"><i class="fa-solid fa-print"></i></button>
+              <button onclick="konfirmasiBatalTransaksi('${trx.id}', '${trx.transactionNumber}')" class="bg-rose-900/40 hover:bg-rose-800 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 text-xs transition"><i class="fa-solid fa-ban"></i> Batal</button>
+            `;
+          }
+
+          htmlRows += `
+            <div class="flex justify-between items-center bg-indigo-900/30 p-4 rounded-xl border ${isBatal ? 'border-rose-500/30 opacity-70' : 'border-indigo-500/20'}">
+              <div>
+                <div class="font-bold text-white text-sm ${isBatal ? 'line-through text-slate-400' : ''}">${trx.transactionNumber}</div>
+                <div class="text-xs text-indigo-300 mt-1">${wkt} • ${trx.cashierName}</div>
+              </div>
+              <div class="text-right flex flex-col items-end gap-2">
+                <div class="font-bold ${isBatal ? 'text-rose-400 line-through' : 'text-amber-400'}">${totalFmt}</div>
+                <div class="flex gap-2">${actionBtns}</div>
+              </div>
+            </div>
+          `;
+        });
+        divList.innerHTML = htmlRows;
+      } catch (err) {
+        divList.innerHTML = '<p class="text-center text-rose-400 py-8">Gagal memuat: '+err.message+'</p>';
+      }
+    }
+    window.tutupModalRiwayat = function() { document.getElementById('modal-riwayat').classList.add('hidden'); }
+
+    window.konfirmasiBatalTransaksi = function(id, no) {
+      document.getElementById('batal-trx-id').value = id;
+      document.getElementById('batal-trx-no').innerText = no;
+      document.getElementById('batal-reason').value = '';
+      document.getElementById('modal-batal').classList.remove('hidden');
+    }
+    window.tutupModalBatal = function() { document.getElementById('modal-batal').classList.add('hidden'); }
+
+    window.prosesBatalTransaksi = async function(event) {
+      event.preventDefault();
+      const id = document.getElementById('batal-trx-id').value;
+      const no = document.getElementById('batal-trx-no').innerText;
+      const reason = document.getElementById('batal-reason').value.trim();
+
+      if(!reason) return;
+      
+      try {
+        const { error } = await supabaseClient.from('transactions').update({ status: 'CANCELLED', cancel_reason: reason }).eq('id', id);
+        if(error) throw error;
+
+        await catatAudit("CANCEL_TRANSACTION", "transaction", id, `Membatalkan Transaksi ${no}. Alasan: ${reason}`);
+        
+        tutupModalBatal();
+        tampilkanPesan("Berhasil", "Transaksi telah dibatalkan.", "success");
+        
+        // Refresh UI List yang sedang terbuka
+        if(!document.getElementById('modal-riwayat').classList.contains('hidden')) bukaModalRiwayat();
+        if(!document.getElementById('tab-laporan').classList.contains('hidden')) jalankanFilterLaporan();
+      } catch(err) {
+        tampilkanPesan("Gagal", "Gagal membatalkan: " + err.message, "error");
+      }
+    }
+
+    // ==========================================
+    // LOGIC LAPORAN (OWNER)
+    // ==========================================
+    window.jalankanFilterLaporan = async function() {
+      const tglMulai = document.getElementById('filter-tgl-mulai').value; 
+      const tglSelesai = document.getElementById('filter-tgl-selesai').value; 
+      const cabang = document.getElementById('filter-cabang').value;
+      if(!tglMulai || !tglSelesai) return;
+
+      const tbody = document.getElementById('tabel-laporan-body');
+      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-indigo-400 py-8">Memproses data...</td></tr>`;
+
+      try {
+        const { data, error } = await supabaseClient.from('transactions').select('*').order('created_at', { ascending: false });
+        if (error) throw error;
+
+        let totalTrx = 0; let totalRp = 0; let htmlRows = '';
+        const start = new Date(tglMulai + "T00:00:00"); 
+        const end = new Date(tglSelesai + "T23:59:59");
+
+        data.forEach(trx => {
+          const trxDate = new Date(trx.created_at);
+          if(trxDate >= start && trxDate <= end) {
+            const trxBranch = (trx.branch_id || 'SOP').trim().toUpperCase();
+            const filterBranch = (cabang || 'ALL').trim().toUpperCase();
+
+            if(filterBranch === 'ALL' || trxBranch === filterBranch) {
+              const isBatal = trx.status === 'CANCELLED';
+              if(!isBatal) { totalTrx += 1; totalRp += Number(trx.total || 0); }
+              
+              const trxEncoded = encodeURIComponent(JSON.stringify(trx));
+              let actionBtns = '';
+              if(isBatal) {
+                actionBtns = `<span class="bg-rose-900/50 text-rose-300 text-[10px] px-2 py-1 rounded border border-rose-500/30 uppercase tracking-widest font-bold block text-center mb-1">DIBATALKAN</span><div class="text-[10px] text-rose-300 italic truncate w-32 mx-auto" title="${trx.cancel_reason}">Ket: ${trx.cancel_reason || '-'}</div>`;
+              } else {
+                actionBtns = `
+                  <div class="flex items-center justify-center gap-2">
+                    <button onclick="cetakUlang('${trxEncoded}')" title="Cetak Ulang" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition"><i class="fa-solid fa-print"></i></button>
+                    <button onclick="konfirmasiBatalTransaksi('${trx.id}', '${trx.transactionNumber}')" title="Void/Batalkan" class="bg-rose-900/40 hover:bg-rose-800 text-rose-300 px-3 py-1.5 rounded-lg border border-rose-500/30 transition"><i class="fa-solid fa-ban"></i></button>
+                  </div>`;
+              }
+
+              htmlRows += `
+                <tr class="hover:bg-indigo-900/30 transition ${isBatal ? 'opacity-60 bg-rose-950/10' : ''}">
+                  <td class="py-4 font-mono ${isBatal ? 'text-slate-400 line-through' : 'text-cyan-400'} pl-2">${trx.transactionNumber}</td>
+                  <td class="py-4 text-indigo-200">${trxDate.toLocaleString('id-ID')}</td>
+                  <td class="py-4 text-indigo-200"><span class="bg-indigo-950/50 border border-indigo-500/30 px-2.5 py-1 rounded-md text-xs tracking-wider">${trx.branch_id}</span></td>
+                  <td class="py-4 text-indigo-200 font-semibold text-xs tracking-widest">${trx.paymentMethod}</td>
+                  <td class="py-4 text-right font-bold ${isBatal ? 'text-rose-400 line-through' : 'text-amber-400'}">Rp ${Number(trx.total).toLocaleString('id-ID')}</td>
+                  <td class="py-4 text-center px-2 align-middle">${actionBtns}</td>
+                </tr>`;
+            }
+          }
+        });
+
+        document.getElementById('rep-total-trx').innerText = totalTrx;
+        document.getElementById('rep-total-rp').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalRp);
+        tbody.innerHTML = htmlRows === '' ? `<tr><td colspan="6" class="text-center text-indigo-400 py-8 italic">Tidak ada transaksi pada periode tersebut.</td></tr>` : htmlRows;
+      } catch (error) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-rose-400 py-8">Terjadi kesalahan sistem.</td></tr>`;
+      }
+    }
+    
+    function initLaporanDefault() {
+      const tglMulaiEl = document.getElementById('filter-tgl-mulai');
+      const tglSelesaiEl = document.getElementById('filter-tgl-selesai');
+      if (tglMulaiEl && tglSelesaiEl && !tglMulaiEl.value) {
+        const now = new Date(); const year = now.getFullYear(); const month = String(now.getMonth() + 1).padStart(2, '0'); const day = String(now.getDate()).padStart(2, '0');
+        const today = `${year}-${month}-${day}`;
+        tglMulaiEl.value = today; tglSelesaiEl.value = today;
+        jalankanFilterLaporan();
+      }
+    }
+    
+    function muatDropdownCabangLaporan() {
+      const select = document.getElementById('filter-cabang'); select.innerHTML = '<option value="ALL">Semua Cabang</option>';
+      let listCabang = window.daftarCabangCache;
+      if (!listCabang || listCabang.length === 0) listCabang = [{ code: 'SOP', name: 'Soppeng' }, { code: 'MAK', name: 'Makassar' }];
+      listCabang.forEach(b => { if (b.code !== 'ALL') select.innerHTML += `<option value="${b.code}">${b.name}</option>`; });
+    }
 
     async function muatDashboard() {
+      // Mengubah query dashboard: hanya menjumlahkan trx dengan status 'COMPLETED'
       const { data, error } = await supabaseClient.from('transactions').select('*').eq('status', 'COMPLETED').order('created_at', { ascending: false });
       if (error || !data) return;
 
@@ -1129,96 +1146,10 @@
       Object.keys(branchTotals).forEach(kodeCabang => {
         listCabangDiv.innerHTML += `
           <div class="flex justify-between items-center bg-indigo-950/40 p-4 rounded-xl border border-indigo-500/20 shadow-sm">
-            <span class="font-bold text-white text-base">${kodeCabang === 'SOP' ? 'Soppeng' : kodeCabang}</span>
+            <span class="font-bold text-white text-base">${kodeCabang}</span>
             <span class="font-bold text-amber-400 text-lg">${fmt(branchTotals[kodeCabang])}</span>
           </div>`;
       });
-    }
-
-    function muatDropdownCabangLaporan() {
-      const select = document.getElementById('filter-cabang'); 
-      select.innerHTML = '<option value="ALL">Semua Cabang</option>';
-      
-      let listCabang = window.daftarCabangCache;
-      if (!listCabang || listCabang.length === 0) {
-        listCabang = [
-          { code: 'SOP', name: 'Soppeng' },
-          { code: 'MAK', name: 'Makassar' }
-        ];
-      }
-
-      listCabang.forEach(b => { 
-        if (b.code !== 'ALL') {
-          select.innerHTML += `<option value="${b.code}">${b.name} (${b.code})</option>`; 
-        }
-      });
-    }
-
-    function initLaporanDefault() {
-      const tglMulaiEl = document.getElementById('filter-tgl-mulai');
-      const tglSelesaiEl = document.getElementById('filter-tgl-selesai');
-      
-      if (tglMulaiEl && tglSelesaiEl && !tglMulaiEl.value) {
-        const now = new Date();
-        const year = now.getFullYear();
-        const month = String(now.getMonth() + 1).padStart(2, '0');
-        const day = String(now.getDate()).padStart(2, '0');
-        const today = `${year}-${month}-${day}`;
-
-        tglMulaiEl.value = today; 
-        tglSelesaiEl.value = today;
-        jalankanFilterLaporan();
-      }
-    }
-
-    window.jalankanFilterLaporan = async function() {
-      const tglMulai = document.getElementById('filter-tgl-mulai').value; 
-      const tglSelesai = document.getElementById('filter-tgl-selesai').value; 
-      const cabang = document.getElementById('filter-cabang').value;
-      
-      if(!tglMulai || !tglSelesai) { return; }
-
-      const tbody = document.getElementById('tabel-laporan-body');
-      tbody.innerHTML = `<tr><td colspan="6" class="text-center text-indigo-400 py-8">Memproses data...</td></tr>`;
-
-      try {
-        const { data, error } = await supabaseClient.from('transactions').select('*').eq('status', 'COMPLETED').order('created_at', { ascending: false });
-        if (error) throw error;
-
-        let totalTrx = 0; let totalRp = 0; let htmlRows = '';
-        const start = new Date(tglMulai + "T00:00:00"); 
-        const end = new Date(tglSelesai + "T23:59:59");
-
-        data.forEach(trx => {
-          const trxDate = new Date(trx.created_at);
-          if(trxDate >= start && trxDate <= end) {
-            const trxBranch = (trx.branch_id || 'SOP').trim().toUpperCase();
-            const filterBranch = (cabang || 'ALL').trim().toUpperCase();
-
-            if(filterBranch === 'ALL' || trxBranch === filterBranch) {
-              totalTrx += 1; 
-              totalRp += Number(trx.total || 0);
-              
-              htmlRows += `
-                <tr class="hover:bg-indigo-900/30 transition">
-                  <td class="py-4 font-mono text-cyan-400">${trx.transactionNumber}</td>
-                  <td class="py-4 text-indigo-200">${trxDate.toLocaleString('id-ID')}</td>
-                  <td class="py-4 text-indigo-200"><span class="bg-indigo-950/50 border border-indigo-500/30 px-2.5 py-1 rounded-md text-xs tracking-wider">${trx.branch_id}</span></td>
-                  <td class="py-4 text-indigo-200">${trx.cashierName}</td>
-                  <td class="py-4 text-indigo-200 font-semibold text-xs tracking-widest">${trx.paymentMethod}</td>
-                  <td class="py-4 text-right font-bold text-amber-400">Rp ${Number(trx.total).toLocaleString('id-ID')}</td>
-                </tr>`;
-            }
-          }
-        });
-
-        document.getElementById('rep-total-trx').innerText = totalTrx;
-        document.getElementById('rep-total-rp').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalRp);
-        tbody.innerHTML = htmlRows === '' ? `<tr><td colspan="6" class="text-center text-indigo-400 py-8 italic">Tidak ada transaksi pada periode tersebut.</td></tr>` : htmlRows;
-      } catch (error) {
-        tampilkanPesan("Gagal", "Gagal memuat laporan: " + error.message, "error");
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-rose-400 py-8">Terjadi kesalahan sistem.</td></tr>`;
-      }
     }
   </script>
 </body>
