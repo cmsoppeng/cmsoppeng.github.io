@@ -172,7 +172,7 @@
         <h2 class="text-2xl font-bold text-white mb-6 flex items-center gap-3"><i class="fa-solid fa-utensils text-cyan-400"></i>Master Menu</h2>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="glass p-6 rounded-[2rem] h-fit shadow-xl">
-            <h3 class="text-base font-bold mb-5 text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-circle-plus"></i>Tambah Menu</h3>
+            <h3 id="form-menu-title" class="text-base font-bold mb-5 text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-circle-plus"></i>Tambah Menu</h3>
             <form id="form-menu" class="space-y-4" onsubmit="handleSimpanMenu(event)">
               <div><input type="text" id="menu-nama" required class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400" placeholder="Nama Menu"></div>
               <div>
@@ -184,7 +184,10 @@
               </div>
               <div><input type="number" id="menu-harga" required class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400" placeholder="Harga (Rp)"></div>
               <div><input type="text" id="menu-img" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400" placeholder="URL Foto/Icon (Opsional)"></div>
-              <button type="submit" id="btn-simpan-menu" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)] mt-2">Simpan Menu</button>
+              <div class="flex gap-2 pt-2">
+                <button type="submit" id="btn-simpan-menu" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)]">Simpan Menu</button>
+                <button type="button" id="btn-batal-edit-menu" onclick="resetFormMenu()" class="hidden bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 px-4 py-3.5 rounded-xl font-bold text-sm border border-indigo-500/30 transition">Batal</button>
+              </div>
             </form>
           </div>
           <div class="md:col-span-2 glass p-6 rounded-[2rem] shadow-xl">
@@ -919,16 +922,76 @@
 
     window.handleSimpanMenu = async function(event) {
       event.preventDefault();
-      const nama = document.getElementById('menu-nama').value; 
+      const nama = document.getElementById('menu-nama').value.trim(); 
       const kategori = document.getElementById('menu-kategori').value;
       const harga = Number(document.getElementById('menu-harga').value); 
       const imageUrl = document.getElementById('menu-img').value.trim();
+      
+      const btnSimpan = document.getElementById('btn-simpan-menu');
+      const editId = btnSimpan.getAttribute('data-edit-id');
+
       try {
-        const { data, error } = await supabaseClient.from('menus').insert([{ name: nama, category: kategori, price: harga, imageUrl: imageUrl || "", active: true }]).select();
-        if (error) throw error;
-        await catatAudit("CREATE_MENU", "menu", data[0].id, `Menambahkan menu ${nama}`);
-        document.getElementById('form-menu').reset(); tampilkanPesan("Berhasil", "Menu disimpan!", "success"); muatData();
-      } catch (error) { tampilkanPesan("Gagal", error.message, "error"); }
+        if (!editId) {
+          const { data, error } = await supabaseClient.from('menus').insert([{ name: nama, category: kategori, price: harga, imageUrl: imageUrl || "", active: true }]).select();
+          if (error) throw error;
+          await catatAudit("CREATE_MENU", "menu", data[0].id, `Menambahkan menu ${nama}`);
+          tampilkanPesan("Berhasil", "Menu baru berhasil disimpan!", "success");
+        } else {
+          const { error } = await supabaseClient.from('menus').update({ name: nama, category: kategori, price: harga, imageUrl: imageUrl || "" }).eq('id', editId);
+          if (error) throw error;
+          await catatAudit("UPDATE_MENU", "menu", editId, `Memperbarui data menu ${nama}`);
+          tampilkanPesan("Berhasil", "Menu berhasil diperbarui!", "success");
+          
+          resetFormMenu();
+        }
+
+        document.getElementById('form-menu').reset(); 
+        muatData();
+      } catch (error) { 
+        tampilkanPesan("Gagal", error.message, "error"); 
+      }
+    }
+
+    window.resetFormMenu = function() {
+      document.getElementById('form-menu').reset();
+      const btnSimpan = document.getElementById('btn-simpan-menu');
+      btnSimpan.innerText = "Simpan Menu";
+      btnSimpan.removeAttribute('data-edit-id');
+      document.getElementById('form-menu-title').innerHTML = '<i class="fa-solid fa-circle-plus"></i> Tambah Menu';
+      document.getElementById('btn-batal-edit-menu').classList.add('hidden');
+    }
+
+    window.mulaiEditMenu = function(menuId) {
+      const menu = window.dataMenuAsli.find(m => m.id === menuId);
+      if(!menu) return;
+
+      document.getElementById('menu-nama').value = menu.name;
+      document.getElementById('menu-kategori').value = menu.category || 'Coto';
+      document.getElementById('menu-harga').value = menu.price;
+      document.getElementById('menu-img').value = menu.imageUrl || '';
+
+      const btnSimpan = document.getElementById('btn-simpan-menu');
+      btnSimpan.innerText = "Perbarui Menu";
+      btnSimpan.setAttribute('data-edit-id', menu.id);
+      
+      document.getElementById('form-menu-title').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Menu';
+      document.getElementById('btn-batal-edit-menu').classList.remove('hidden');
+
+      document.getElementById('form-menu').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.hapusMenu = async function(menuId, namaMenu) {
+      tampilkanKonfirmasi("Konfirmasi Hapus", `Apakah Anda yakin ingin menghapus menu "${namaMenu}"?`, async () => {
+        try {
+          const { error } = await supabaseClient.from('menus').delete().eq('id', menuId);
+          if (error) throw error;
+          await catatAudit("DELETE_MENU", "menu", menuId, `Menghapus menu ${namaMenu}`);
+          tampilkanPesan("Berhasil", "Menu berhasil dihapus!", "success");
+          muatData();
+        } catch (error) {
+          tampilkanPesan("Gagal", error.message, "error");
+        }
+      });
     }
 
     async function muatData() {
@@ -939,8 +1002,19 @@
         divDaftarMaster.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada menu.</p>'; return;
       }
       window.dataMenuAsli.forEach((menu) => {
-        divDaftarMaster.innerHTML += `<div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm mb-3">
-            <div><p class="font-bold text-white">${menu.name}</p><p class="text-xs text-indigo-300">Rp ${menu.price}</p></div>
+        divDaftarMaster.innerHTML += `
+          <div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm mb-3 gap-3">
+            <div class="flex items-center gap-3">
+              ${menu.imageUrl ? `<img src="${menu.imageUrl}" class="w-10 h-10 rounded-xl object-cover border border-indigo-500/40">` : `<div class="w-10 h-10 rounded-xl bg-indigo-900/50 flex items-center justify-center text-cyan-400 text-sm"><i class="fa-solid fa-utensils"></i></div>`}
+              <div>
+                <p class="font-bold text-white text-sm">${menu.name} <span class="text-xs text-indigo-300 font-normal ml-2">(${menu.category})</span></p>
+                <p class="text-xs text-amber-400 font-semibold">Rp ${new Intl.NumberFormat('id-ID').format(menu.price)}</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="mulaiEditMenu('${menu.id}')" title="Edit Menu / Tambah Gambar" class="text-xs text-sky-300 hover:text-white border border-sky-900/50 bg-sky-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="hapusMenu('${menu.id}', '${menu.name}')" title="Hapus Menu" class="text-xs text-rose-300 hover:text-white border border-rose-900/50 bg-rose-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-trash"></i></button>
+            </div>
           </div>`;
       });
       document.getElementById('info-jml-menu').innerText = `${window.dataMenuAsli.length} MENU`;
@@ -954,11 +1028,9 @@
         const fmtRp = new Intl.NumberFormat('id-ID').format(menu.price);
         const iconClass = getSmartIcon(menu.name, menu.category);
         
-        // PENGAMAN OTOMATIS (FALLBACK): 
-        // Jika link gambar gagal dimuat (onerror), otomatis sembunyikan gambar & tampilkan ikon cerdas
+        // PENGAMAN OTOMATIS (FALLBACK) & KONVERTER LINK GOOGLE DRIVE: 
         let mediaCard = '';
         if (menu.imageUrl && menu.imageUrl.trim() !== '') {
-          // Tangani otomatis link Google Drive view agar menjadi direct link jika memungkinkan
           let finalImgUrl = menu.imageUrl.trim();
           if (finalImgUrl.includes('drive.google.com/file/d/')) {
             const fileIdMatch = finalImgUrl.match(/\/d\/([a-zA-Z0-9_-]+)/);
