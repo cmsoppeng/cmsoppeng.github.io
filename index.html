@@ -197,14 +197,15 @@
         </div>
       </div>
 
-      <!-- TAB 3: CABANG -->
+      <!-- TAB 3: CABANG (DENGAN FITUR CRUD LENGKAP) -->
       <div id="tab-cabang" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-code-branch text-cyan-400"></i>Cabang</h2>
         <p class="text-indigo-300 text-sm mb-6">Kelola dan tambahkan lokasi cabang operasional Coto Mario.</p>
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           <div class="glass p-6 rounded-[2rem] h-fit shadow-xl">
-            <h3 class="text-base font-bold mb-5 text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-circle-plus"></i>Tambah Cabang</h3>
+            <h3 id="form-cabang-title" class="text-base font-bold mb-5 text-cyan-400 flex items-center gap-2"><i class="fa-solid fa-circle-plus"></i>Tambah Cabang</h3>
             <form id="form-cabang" class="space-y-4" onsubmit="handleSimpanCabang(event)">
+              <input type="hidden" id="cabang-edit-id">
               <div>
                 <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Nama Cabang</label>
                 <input type="text" id="cabang-nama" required class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400" placeholder="Contoh: Makassar">
@@ -213,7 +214,10 @@
                 <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Kode (3 Huruf)</label>
                 <input type="text" id="cabang-kode" required maxlength="3" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm uppercase focus:outline-none focus:border-cyan-400" placeholder="Contoh: MAK">
               </div>
-              <button type="submit" class="w-full bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)] mt-2">Simpan Cabang</button>
+              <div class="flex gap-2 pt-2">
+                <button type="submit" id="btn-simpan-cabang" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-bold py-3.5 rounded-xl text-sm transition shadow-[0_4px_15px_rgba(6,182,212,0.4)]">Simpan Cabang</button>
+                <button type="button" id="btn-batal-edit-cabang" onclick="resetFormCabang()" class="hidden bg-indigo-900/80 hover:bg-indigo-800 text-indigo-200 px-4 py-3.5 rounded-xl font-bold text-sm border border-indigo-500/30 transition">Batal</button>
+              </div>
             </form>
           </div>
           <div class="md:col-span-2 glass p-6 rounded-[2rem] shadow-xl">
@@ -764,7 +768,7 @@
     }
 
     // ==========================================
-    // CABANG & AKUN LOGIC
+    // CABANG LOGIC (DENGAN FULL CRUD)
     // ==========================================
     async function sinkronisasiCacheCabang() {
       const { data } = await supabaseClient.from('branches').select('*').eq('active', true);
@@ -775,23 +779,83 @@
       event.preventDefault();
       const nama = document.getElementById('cabang-nama').value.trim();
       const kode = document.getElementById('cabang-kode').value.trim().toUpperCase();
+      const btnSimpan = document.getElementById('btn-simpan-cabang');
+      const editId = btnSimpan.getAttribute('data-edit-id');
+
       try {
-        const { error } = await supabaseClient.from('branches').upsert([{ code: kode, name: nama, active: true }]);
-        if (error) throw error;
-        await catatAudit("CREATE_BRANCH", "branch", kode, `Menambahkan cabang ${nama}`);
+        if (!editId) {
+          const { error } = await supabaseClient.from('branches').insert([{ code: kode, name: nama, active: true }]);
+          if (error) throw error;
+          await catatAudit("CREATE_BRANCH", "branch", kode, `Menambahkan cabang ${nama}`);
+          tampilkanPesan("Berhasil", "Cabang berhasil disimpan!", "success");
+        } else {
+          const { error } = await supabaseClient.from('branches').update({ name: nama }).eq('code', editId);
+          if (error) throw error;
+          await catatAudit("UPDATE_BRANCH", "branch", editId, `Memperbarui cabang ${nama}`);
+          tampilkanPesan("Berhasil", "Cabang berhasil diperbarui!", "success");
+          resetFormCabang();
+        }
         document.getElementById('form-cabang').reset();
-        tampilkanPesan("Berhasil", "Cabang berhasil disimpan!", "success");
-        await sinkronisasiCacheCabang(); muatDaftarCabang();
+        await sinkronisasiCacheCabang(); 
+        muatDaftarCabang();
       } catch (error) { tampilkanPesan("Gagal", error.message, "error"); }
+    }
+
+    window.resetFormCabang = function() {
+      document.getElementById('form-cabang').reset();
+      document.getElementById('cabang-kode').disabled = false;
+      const btnSimpan = document.getElementById('btn-simpan-cabang');
+      btnSimpan.innerText = "Simpan Cabang";
+      btnSimpan.removeAttribute('data-edit-id');
+      document.getElementById('form-cabang-title').innerHTML = '<i class="fa-solid fa-circle-plus"></i> Tambah Cabang';
+      document.getElementById('btn-batal-edit-cabang').classList.add('hidden');
+    }
+
+    window.mulaiEditCabang = function(kode, nama) {
+      document.getElementById('cabang-kode').value = kode;
+      document.getElementById('cabang-kode').disabled = true; // Kode tidak boleh diubah setelah dibuat
+      document.getElementById('cabang-nama').value = nama;
+
+      const btnSimpan = document.getElementById('btn-simpan-cabang');
+      btnSimpan.innerText = "Perbarui Cabang";
+      btnSimpan.setAttribute('data-edit-id', kode);
+
+      document.getElementById('form-cabang-title').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Cabang';
+      document.getElementById('btn-batal-edit-cabang').classList.remove('hidden');
+      document.getElementById('form-cabang').scrollIntoView({ behavior: 'smooth' });
+    }
+
+    window.hapusCabang = async function(kode, nama) {
+      tampilkanKonfirmasi("Konfirmasi Hapus", `Apakah Anda yakin ingin menghapus cabang ${nama} (${kode})?`, async () => {
+        try {
+          const { error } = await supabaseClient.from('branches').delete().eq('code', kode);
+          if (error) throw error;
+          await catatAudit("DELETE_BRANCH", "branch", kode, `Menghapus cabang ${nama}`);
+          tampilkanPesan("Berhasil", "Cabang berhasil dihapus!", "success");
+          await sinkronisasiCacheCabang();
+          muatDaftarCabang();
+        } catch (error) {
+          tampilkanPesan("Gagal", error.message, "error");
+        }
+      });
     }
 
     async function muatDaftarCabang() {
       const { data, error } = await supabaseClient.from('branches').select('*');
       const divCabang = document.getElementById('daftar-cabang'); divCabang.innerHTML = '';
       if(error || !data || data.length === 0) return divCabang.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada cabang terdaftar.</p>';
+      
       data.forEach(b => {
-        divCabang.innerHTML += `<div class="p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm mb-3">
-            <div><p class="font-bold text-white text-base">${b.name}</p><p class="text-xs text-amber-400 font-mono mt-1">Kode: ${b.code}</p></div>
+        divCabang.innerHTML += `
+          <div class="flex justify-between items-center p-4 bg-indigo-950/40 rounded-2xl border border-indigo-500/30 shadow-sm mb-3">
+            <div>
+              <p class="font-bold text-white text-base">${b.name}</p>
+              <p class="text-xs text-amber-400 font-mono mt-1">Kode: ${b.code}</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="mulaiEditCabang('${b.code}', '${b.name}')" title="Edit Cabang" class="text-xs text-sky-300 hover:text-white border border-sky-900/50 bg-sky-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="hapusCabang('${b.code}', '${b.name}')" title="Hapus Cabang" class="text-xs text-rose-300 hover:text-white border border-rose-900/50 bg-rose-950/30 rounded-xl px-3 py-1.5 transition"><i class="fa-solid fa-trash"></i></button>
+            </div>
           </div>`;
       });
     }
@@ -941,10 +1005,8 @@
           if (error) throw error;
           await catatAudit("UPDATE_MENU", "menu", editId, `Memperbarui data menu ${nama}`);
           tampilkanPesan("Berhasil", "Menu berhasil diperbarui!", "success");
-          
           resetFormMenu();
         }
-
         document.getElementById('form-menu').reset(); 
         muatData();
       } catch (error) { 
@@ -976,7 +1038,6 @@
       
       document.getElementById('form-menu-title').innerHTML = '<i class="fa-solid fa-pen-to-square"></i> Edit Menu';
       document.getElementById('btn-batal-edit-menu').classList.remove('hidden');
-
       document.getElementById('form-menu').scrollIntoView({ behavior: 'smooth' });
     }
 
@@ -1028,7 +1089,6 @@
         const fmtRp = new Intl.NumberFormat('id-ID').format(menu.price);
         const iconClass = getSmartIcon(menu.name, menu.category);
         
-        // PENGAMAN OTOMATIS (FALLBACK) & KONVERTER LINK GOOGLE DRIVE: 
         let mediaCard = '';
         if (menu.imageUrl && menu.imageUrl.trim() !== '') {
           let finalImgUrl = menu.imageUrl.trim();
@@ -1418,7 +1478,6 @@
       let branchTotals = {};
       const todayDateStr = new Date().toDateString();
 
-      // Inisialisasi awal branchTotals berdasarkan master cabang aktif supaya cabang dengan 0 transaksi tetap muncul
       let listCabangAktif = window.daftarCabangCache.filter(b => b.code !== 'ALL');
       if(listCabangAktif.length === 0) listCabangAktif = [{code: 'SOP', name: 'Soppeng'}, {code: 'TAK', name: 'Takalala'}];
       listCabangAktif.forEach(c => { branchTotals[c.code] = 0; });
@@ -1429,14 +1488,12 @@
           const bId = (trx.branch_id || 'SOP').trim().toUpperCase();
           const nominal = Number(trx.total || 0);
 
-          // Rekap akumulasi seluruh cabang untuk rincian card kanan
           if (branchTotals[bId] !== undefined) {
             branchTotals[bId] += nominal;
           } else {
-            branchTotals[bId] = nominal; // Mengantisipasi cabang baru
+            branchTotals[bId] = nominal; 
           }
 
-          // Filter perhitungan berdasarkan pilihan owner di dashboard
           if (window.dashboardFilterCabang === 'ALL' || window.dashboardFilterCabang === bId) {
             totalRP += nominal; 
             totalTrx += 1;
@@ -1449,7 +1506,6 @@
 
       const fmt = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
       
-      // Update Label & Nilai Total Penjualan sesuai filter aktif
       const labelPenjualan = window.dashboardFilterCabang === 'ALL' ? 'Total Penjualan (Semua Cabang)' : `Total Penjualan (Cabang ${window.dashboardFilterCabang})`;
       document.getElementById('dash-label-penjualan').innerText = labelPenjualan;
       document.getElementById('dash-total-rp').innerText = fmt(totalRP); 
@@ -1458,7 +1514,6 @@
       document.getElementById('dash-metode-qris').innerText = fmt(metodeQris); 
       document.getElementById('dash-metode-transfer').innerText = fmt(metodeTransfer);
 
-      // Render Rincian Per Cabang (Hanya menampilkan cabang riil, tanpa "ALL")
       const listCabangDiv = document.getElementById('dash-cabang-list'); 
       listCabangDiv.innerHTML = '';
       
