@@ -120,7 +120,7 @@
       <!-- TAB 1: LAYAR KASIR (POS) -->
       <div id="tab-pos" class="h-full flex flex-col lg:flex-row gap-4 p-4 overflow-y-auto lg:overflow-hidden">
         
-        <!-- BAGIAN 1: PILIH MENU (Full Scroll ke bawah di HP, Samping di Tablet/Desktop) -->
+        <!-- BAGIAN 1: PILIH MENU -->
         <div class="flex-1 glass rounded-[2rem] p-5 flex flex-col shadow-2xl h-auto lg:h-full lg:overflow-hidden">
           <h2 class="text-base font-bold mb-4 text-white border-b border-indigo-500/30 pb-3 flex flex-wrap items-center justify-between gap-3 shrink-0">
             <span class="flex items-center gap-2 text-cyan-400"><i class="fa-solid fa-layer-group"></i><span class="text-white">Pilih Menu</span></span>
@@ -134,7 +134,6 @@
             <span id="info-jml-menu" class="text-sm text-indigo-300 font-medium bg-indigo-900/50 px-3 py-1 rounded-full border border-indigo-500/30">0 item</span>
           </h2>
           
-          <!-- Kontainer Menu: Di HP mengalir ke bawah (bisa scroll penuh halaman), di Desktop scroll internal -->
           <div id="pos-menu-container" class="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:overflow-y-auto pr-0 lg:pr-2 pb-6 lg:pb-4 flex-1 content-start">
             <div id="pos-makanan" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-2 gap-4 content-start"></div>
             <div id="pos-minuman" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 xl:grid-cols-2 gap-4 content-start border-t lg:border-t-0 lg:border-l border-indigo-500/30 pt-6 lg:pt-0 lg:pl-6"></div>
@@ -438,6 +437,15 @@
           <span id="modal-total" class="text-2xl font-bold text-amber-400 drop-shadow-md">Rp 0</span>
         </div>
         <div id="form-tunai" class="mt-4 space-y-4 pt-4 border-t border-indigo-500/30">
+          
+          <!-- TOMBOL PINTASAN NOMINAL CEPAT -->
+          <div>
+            <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Pintasan Nominal</label>
+            <div id="container-quick-cash" class="grid grid-cols-4 gap-2">
+              <!-- Diisi otomatis oleh JavaScript -->
+            </div>
+          </div>
+
           <div>
             <label class="block text-sm text-indigo-300 mb-2 font-medium">Uang Diterima (Rp)</label>
             <input type="number" id="uang-diterima" oninput="hitungKembalian()" class="w-full bg-indigo-950/60 border border-indigo-500/50 rounded-xl px-4 py-3 text-white font-bold text-lg focus:outline-none focus:border-cyan-400 focus:ring-1 focus:ring-cyan-400" placeholder="0">
@@ -999,20 +1007,12 @@
       const n = (name || "").toLowerCase();
       const c = (category || "").toLowerCase();
       
-      // Makanan / Coto
       if (n.includes('coto')) return 'fa-solid fa-bowl-food';
       if (n.includes('ketupat') || n.includes('nasi') || n.includes('lontong')) return 'fa-solid fa-diamond';
-      
-      // Minuman Berkarbonasi / Soda (Sprite, Fanta, dll)
       if (n.includes('sprite') || n.includes('fanta') || n.includes('soda') || n.includes('cola')) return 'fa-solid fa-bottle-droplet';
-      
-      // Air Mineral / Teh / Botol Minum
       if (n.includes('air') || n.includes('mineral') || n.includes('teh') || n.includes('pucuk')) return 'fa-solid fa-cup-togo';
-      
-      // Suplemen / Susu / Benecol
       if (n.includes('benecol') || n.includes('susu') || n.includes('vitamin') || n.includes('suplemen')) return 'fa-solid fa-prescription-bottle-medical';
       
-      // Kategori Umum
       if (c.includes('minum')) return 'fa-solid fa-cup-togo';
       if (c.includes('tambah')) return 'fa-solid fa-utensils';
       return 'fa-solid fa-bowl-food';
@@ -1200,9 +1200,53 @@
 
       let total = window.keranjang.reduce((sum, item) => sum + item.subtotal, 0);
       document.getElementById('modal-total').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR' }).format(total);
-      document.getElementById('uang-diterima').value = ''; document.getElementById('uang-kembalian').innerText = 'Rp 0';
+      
+      // Generate tombol pintasan nominal cepat
+      generateQuickCashButtons(total);
+
+      document.getElementById('uang-diterima').value = ''; 
+      document.getElementById('uang-kembalian').innerText = 'Rp 0';
       document.getElementById('modal-pembayaran').classList.remove('hidden');
     }
+
+    function generateQuickCashButtons(total) {
+      const container = document.getElementById('container-quick-cash');
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Tombol 1: Uang Pas
+      let buttonsHtml = `<button type="button" onclick="pilihNominalCepat(${total})" class="bg-indigo-900/60 hover:bg-cyan-500/20 border border-indigo-500/40 hover:border-cyan-400 text-cyan-300 font-bold text-xs py-2.5 px-1 rounded-xl transition shadow-sm">Uang Pas</button>`;
+
+      // Kalkulasi pecahan uang kertas umum di atas total belanja
+      let suggestions = [];
+      if (total <= 10000) {
+        suggestions = [10000, 20000, 50000];
+      } else if (total <= 50000) {
+        suggestions = [50000, 100000];
+      } else {
+        let p50 = Math.ceil(total / 50000) * 50000;
+        if (p50 === total) p50 += 50000;
+        let p100 = Math.ceil(total / 100000) * 100000;
+        if (p100 === total) p100 += 100000;
+        
+        suggestions = [p50, p100, p100 + 50000];
+      }
+
+      let uniqueSuggestions = [...new Set(suggestions)].slice(0, 3);
+
+      uniqueSuggestions.forEach(nominal => {
+        let labelFmt = nominal >= 1000000 ? (nominal/1000000) + 'jt' : (nominal/1000) + '.000';
+        buttonsHtml += `<button type="button" onclick="pilihNominalCepat(${nominal})" class="bg-indigo-900/60 hover:bg-cyan-500/20 border border-indigo-500/40 hover:border-cyan-400 text-white font-bold text-xs py-2.5 px-1 rounded-xl transition shadow-sm">${labelFmt}</button>`;
+      });
+
+      container.innerHTML = buttonsHtml;
+    }
+
+    window.pilihNominalCepat = function(nominal) {
+      document.getElementById('uang-diterima').value = nominal;
+      hitungKembalian();
+    }
+
     window.tutupModalPembayaran = function() { document.getElementById('modal-pembayaran').classList.add('hidden'); }
     
     window.pilihMetode = function(metode) {
@@ -1221,7 +1265,18 @@
     window.prosesPembayaran = async function() {
       let total = window.keranjang.reduce((sum, item) => sum + item.subtotal, 0); 
       let diterima = Number(document.getElementById('uang-diterima').value) || 0;
-      if(window.metodePilih === 'TUNAI' && diterima < total) { tampilkanPesan("Peringatan", "Uang yang diterima kurang!", "error"); return; }
+      if(window.metodePilih === 'TUNAI' && diterima < total) { 
+        tampilkanPesan("Peringatan", "Uang yang diterima kurang!", "error"); 
+        return; 
+      }
+
+      // Ambil tombol bayar untuk pengaman anti double-click sementara proses berjalan
+      const modalBayarBtn = document.querySelector('#modal-pembayaran button[onclick="prosesPembayaran()"]');
+      if (modalBayarBtn) {
+        if (modalBayarBtn.disabled) return;
+        modalBayarBtn.disabled = true;
+        modalBayarBtn.innerText = "Memproses...";
+      }
 
       try {
         let branchCode = currentUserData.branch_id;
@@ -1243,11 +1298,35 @@
         };
 
         const { data, error } = await supabaseClient.from('transactions').insert([transaksiBaru]).select();
-        if (error) throw error;
+        
+        if (error) {
+          // Tangkap error khusus bentrok nomor unik database (PostgreSQL error code 23505)
+          if (error.code === '23505' || (error.message && error.message.includes('unique'))) {
+            throw new Error("KODE_KEMBAR");
+          }
+          throw error;
+        }
+
         await catatAudit("CREATE_TRANSACTION", "transaction", data[0].id, `Transaksi ${transactionNumber} Rp ${total.toLocaleString('id-ID')}`);
 
-        tutupModalPembayaran(); tampilkanStruk(transaksiBaru, false); window.keranjang = []; renderKeranjang();
-      } catch (error) { tampilkanPesan("Gagal", error.message, "error"); }
+        tutupModalPembayaran(); 
+        tampilkanStruk(transaksiBaru, false); 
+        window.keranjang = []; 
+        renderKeranjang();
+
+      } catch (error) {
+        if (error.message === "KODE_KEMBAR") {
+          tampilkanPesan("Sistem Sibuk / Bersamaan", "Terjadi transaksi bersamaan dari kasir lain. Silakan klik tombol 'Selesaikan' sekali lagi.", "error");
+        } else {
+          tampilkanPesan("Gagal", error.message, "error");
+        }
+      } finally {
+        // Kembalikan tombol ke kondisi semula agar bisa diklik ulang jika terjadi penolakan
+        if (modalBayarBtn) {
+          modalBayarBtn.disabled = false;
+          modalBayarBtn.innerText = "Selesaikan";
+        }
+      }
     }
 
     window.tampilkanStruk = function(trx, isReprint = false) {
