@@ -271,12 +271,18 @@
         </div>
       </div>
 
-      <!-- TAB 5: LOG -->
+      <!-- TAB 5: LOG (DENGAN PAGINATION) -->
       <div id="tab-audit" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-cyan-400"></i>Log Sistem</h2>
         <p class="text-indigo-300 text-sm mb-6">Catatan aktivitas penting dan histori administratif sistem Coto Mario.</p>
         <div class="glass p-6 rounded-[2rem] shadow-xl">
-          <div id="daftar-audit" class="space-y-3"><p class="text-indigo-400 text-center py-6 text-sm">Memuat log...</p></div>
+          <div id="daftar-audit" class="space-y-3 mb-6"><p class="text-indigo-400 text-center py-6 text-sm">Memuat log...</p></div>
+          <!-- NAVIGASI PAGINATION LOG -->
+          <div id="audit-pagination" class="flex justify-between items-center border-t border-indigo-500/30 pt-4 hidden">
+            <button onclick="gantiHalamanAudit(-1)" id="btn-audit-prev" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
+            <span id="audit-page-info" class="text-xs text-indigo-300 font-medium">Halaman 1</span>
+            <button onclick="gantiHalamanAudit(1)" id="btn-audit-next" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2">Selanjutnya <i class="fa-solid fa-chevron-right"></i></button>
+          </div>
         </div>
       </div>
 
@@ -305,18 +311,15 @@
            <!-- Total Omzet Keseluruhan -->
            <div class="glass p-6 rounded-[2rem] border border-cyan-500/40 shadow-[0_0_20px_rgba(34,211,238,0.1)] bg-cyan-950/20">
               <div class="text-cyan-400 text-xs font-bold uppercase tracking-widest mb-2">Total Omzet Keseluruhan</div>
-              <!-- DIUBAH: Ditambah font-black agar sangat tebal dan text-amber-400 untuk warna kuning -->
               <div id="dash-total-rp" class="text-4xl sm:text-5xl font-black text-amber-400 drop-shadow-md">Rp 0</div>
            </div>
 
            <!-- Total Transaksi & Coto Terjual -->
            <div class="glass p-6 rounded-[2rem] border border-indigo-500/30">
               <div class="text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-1">Total Transaksi</div>
-              <!-- DIUBAH: Ditambah font-extrabold agar lebih tebal -->
               <div id="dash-total-trx" class="text-3xl font-extrabold text-white drop-shadow-md mb-5">0 <span class="text-lg text-indigo-400 font-normal">TX</span></div>
               
               <div class="text-indigo-300 text-[11px] font-bold uppercase tracking-widest mb-1">Coto Terjual</div>
-              <!-- DIUBAH: Ditambah font-extrabold agar lebih tebal -->
               <div id="dash-total-coto" class="text-3xl font-extrabold text-white drop-shadow-md">0 <span class="text-lg text-indigo-400 font-normal">PORSI</span></div>
            </div>
         </div>
@@ -353,7 +356,7 @@
         </div>
       </div>
 
-      <!-- TAB 7: LAPORAN -->
+      <!-- TAB 7: LAPORAN (DENGAN PAGINATION) -->
       <div id="tab-laporan" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-file-lines text-cyan-400"></i>Laporan Penjualan</h2>
         <p class="text-indigo-300 text-sm mb-6">Filter dan analisis data transaksi historis untuk seluruh cabang.</p>
@@ -361,15 +364,15 @@
         <div class="glass p-5 rounded-[2rem] mb-6 grid grid-cols-1 sm:grid-cols-3 gap-4 items-end shadow-xl">
           <div>
             <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Dari Tanggal</label>
-            <input type="date" id="filter-tgl-mulai" onchange="jalankanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
+            <input type="date" id="filter-tgl-mulai" onchange="resetDanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
           </div>
           <div>
             <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Sampai Tanggal</label>
-            <input type="date" id="filter-tgl-selesai" onchange="jalankanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
+            <input type="date" id="filter-tgl-selesai" onchange="resetDanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3 text-white text-sm focus:outline-none focus:border-cyan-400">
           </div>
           <div>
             <label class="block text-xs font-semibold text-indigo-300 mb-2 uppercase tracking-wider">Cabang</label>
-            <select id="filter-cabang" onchange="jalankanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400">
+            <select id="filter-cabang" onchange="resetDanFilterLaporan()" class="w-full bg-indigo-950/50 border border-indigo-500/30 rounded-xl px-4 py-3.5 text-white text-sm focus:outline-none focus:border-cyan-400">
               <option value="ALL">Semua Cabang</option>
             </select>
           </div>
@@ -406,6 +409,12 @@
               <tr><td colspan="6" class="text-center text-indigo-400 py-8">Memuat data laporan...</td></tr>
             </tbody>
           </table>
+          <!-- NAVIGASI PAGINATION LAPORAN -->
+          <div id="laporan-pagination" class="flex justify-between items-center border-t border-indigo-500/30 pt-4 mt-4 hidden">
+            <button onclick="gantiHalamanLaporan(-1)" id="btn-laporan-prev" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
+            <span id="laporan-page-info" class="text-xs text-indigo-300 font-medium">Halaman 1</span>
+            <button onclick="gantiHalamanLaporan(1)" id="btn-laporan-next" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2">Selanjutnya <i class="fa-solid fa-chevron-right"></i></button>
+          </div>
         </div>
       </div>
 
@@ -584,6 +593,14 @@
     window.metodePilih = 'TUNAI';
     window.posCabangAktif = null;
 
+    // State Pagination Log & Laporan
+    let auditPage = 1;
+    const auditLimit = 20;
+
+    let laporanPage = 1;
+    const laporanLimit = 20;
+    let cachedLaporanData = [];
+
     window.tampilkanPesan = function(judul, pesan, tipe = 'info') {
       const modal = document.getElementById('modal-notif');
       const titleEl = document.getElementById('notif-title');
@@ -676,7 +693,7 @@
       
       if(tabName === 'cabang') muatDaftarCabang();
       if(tabName === 'akun') { muatDropdownCabang(); muatDaftarAkun(); }
-      if(tabName === 'audit') muatAuditTrail();
+      if(tabName === 'audit') { auditPage = 1; muatAuditTrail(); }
       if(tabName === 'dashboard') muatDashboard();
       if(tabName === 'laporan') { muatDropdownCabangLaporan(); initLaporanDefault(); }
     }
@@ -898,10 +915,27 @@
       window.daftarCabangCache.forEach(b => { if (b.code !== 'ALL') select.innerHTML += `<option value="${b.code}">${b.name}</option>`; });
     }
 
+    // LOG Sিস্টem DENGAN PAGINATION AMAN
     async function muatAuditTrail() {
-      const { data, error } = await supabaseClient.from('auditlogs').select('*').order('created_at', { ascending: false });
-      const divAudit = document.getElementById('daftar-audit'); divAudit.innerHTML = '';
-      if(error || !data || data.length === 0) { divAudit.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada catatan log.</p>'; return; }
+      const divAudit = document.getElementById('daftar-audit'); 
+      const paginationEl = document.getElementById('audit-pagination');
+      divAudit.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Memuat log...</p>';
+      paginationEl.classList.add('hidden');
+
+      const fromRow = (auditPage - 1) * auditLimit;
+      const toRow = fromRow + auditLimit - 1;
+
+      const { data, error, count } = await supabaseClient
+        .from('auditlogs')
+        .select('*', { count: 'exact' })
+        .order('created_at', { ascending: false })
+        .range(fromRow, toRow);
+
+      divAudit.innerHTML = '';
+      if(error || !data || data.length === 0) { 
+        divAudit.innerHTML = '<p class="text-indigo-400 text-center py-6 text-sm">Belum ada catatan log.</p>'; 
+        return; 
+      }
       
       data.forEach(log => {
         const waktu = log.created_at ? new Date(log.created_at).toLocaleString('id-ID') : 'Baru saja';
@@ -914,6 +948,21 @@
             <div class="text-xs text-indigo-400 font-mono bg-indigo-900/30 px-2 py-1 rounded border border-indigo-500/20 whitespace-nowrap">${waktu}</div>
           </div>`;
       });
+
+      // Atur Tampilan Tombol Pagination Log
+      const totalPages = Math.ceil((count || 0) / auditLimit) || 1;
+      document.getElementById('audit-page-info').innerText = `Halaman ${auditPage} dari ${totalPages}`;
+      document.getElementById('btn-audit-prev').disabled = auditPage <= 1;
+      document.getElementById('btn-audit-prev').style.opacity = auditPage <= 1 ? '0.4' : '1';
+      document.getElementById('btn-audit-next').disabled = auditPage >= totalPages;
+      document.getElementById('btn-audit-next').style.opacity = auditPage >= totalPages ? '0.4' : '1';
+      paginationEl.classList.remove('hidden');
+    }
+
+    window.gantiHalamanAudit = function(arah) {
+      auditPage += arah;
+      if (auditPage < 1) auditPage = 1;
+      muatAuditTrail();
     }
 
     async function muatDaftarAkun() {
@@ -1273,7 +1322,6 @@
         return; 
       }
 
-      // Ambil tombol bayar untuk pengaman anti double-click sementara proses berjalan
       const modalBayarBtn = document.querySelector('#modal-pembayaran button[onclick="prosesPembayaran()"]');
       if (modalBayarBtn) {
         if (modalBayarBtn.disabled) return;
@@ -1303,7 +1351,6 @@
         const { data, error } = await supabaseClient.from('transactions').insert([transaksiBaru]).select();
         
         if (error) {
-          // Tangkap error khusus bentrok nomor unik database (PostgreSQL error code 23505)
           if (error.code === '23505' || (error.message && error.message.includes('unique'))) {
             throw new Error("KODE_KEMBAR");
           }
@@ -1324,7 +1371,6 @@
           tampilkanPesan("Gagal", error.message, "error");
         }
       } finally {
-        // Kembalikan tombol ke kondisi semula agar bisa diklik ulang jika terjadi penolakan
         if (modalBayarBtn) {
           modalBayarBtn.disabled = false;
           modalBayarBtn.innerText = "Selesaikan";
@@ -1478,6 +1524,12 @@
       }
     }
 
+    // LAPORAN PENJUALAN DENGAN PAGINATION AMAN
+    window.resetDanFilterLaporan = function() {
+      laporanPage = 1;
+      jalankanFilterLaporan();
+    }
+
     window.jalankanFilterLaporan = async function() {
       const tglMulai = document.getElementById('filter-tgl-mulai').value; 
       const tglSelesai = document.getElementById('filter-tgl-selesai').value; 
@@ -1485,13 +1537,16 @@
       if(!tglMulai || !tglSelesai) return;
 
       const tbody = document.getElementById('tabel-laporan-body');
+      const paginationEl = document.getElementById('laporan-pagination');
       tbody.innerHTML = `<tr><td colspan="6" class="text-center text-indigo-400 py-8">Memproses data...</td></tr>`;
+      paginationEl.classList.add('hidden');
 
       try {
         const { data, error } = await supabaseClient.from('transactions').select('*').order('created_at', { ascending: false });
         if (error) throw error;
 
-        let totalTrx = 0; let totalRp = 0; let htmlRows = '';
+        let filteredList = [];
+        let totalTrx = 0; let totalRp = 0; 
         const start = new Date(tglMulai + "T00:00:00"); 
         const end = new Date(tglSelesai + "T23:59:59");
 
@@ -1504,38 +1559,80 @@
             if(filterBranch === 'ALL' || trxBranch === filterBranch) {
               const isBatal = trx.status === 'CANCELLED';
               if(!isBatal) { totalTrx += 1; totalRp += Number(trx.total || 0); }
-              
-              const trxEncoded = encodeURIComponent(JSON.stringify(trx));
-              let actionBtns = '';
-              if(isBatal) {
-                actionBtns = `<span class="bg-rose-900/50 text-rose-300 text-[10px] px-2 py-1 rounded border border-rose-500/30 uppercase tracking-widest font-bold block text-center mb-1">DIBATALKAN</span><div class="text-[10px] text-rose-300 italic truncate w-32 mx-auto" title="${trx.cancel_reason}">Ket: ${trx.cancel_reason || '-'}</div>`;
-              } else {
-                actionBtns = `
-                  <div class="flex items-center justify-center gap-2">
-                    <button onclick="cetakUlang('${trxEncoded}')" title="Tampilkan E-Receipt" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition"><i class="fa-solid fa-receipt"></i></button>
-                    <button onclick="konfirmasiBatalTransaksi('${trx.id}', '${trx.transactionNumber}')" title="Void/Batalkan" class="bg-rose-900/40 hover:bg-rose-800 text-rose-300 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition"><i class="fa-solid fa-ban"></i></button>
-                  </div>`;
-              }
-
-              htmlRows += `
-                <tr class="hover:bg-indigo-900/30 transition ${isBatal ? 'opacity-60 bg-rose-950/10' : ''}">
-                  <td class="py-4 font-mono ${isBatal ? 'text-slate-400 line-through' : 'text-cyan-400'} pl-2">${trx.transactionNumber}</td>
-                  <td class="py-4 text-indigo-200">${trxDate.toLocaleString('id-ID')}</td>
-                  <td class="py-4 text-indigo-200"><span class="bg-indigo-950/50 border border-indigo-500/30 px-2.5 py-1 rounded-md text-xs tracking-wider">${trx.branch_id}</span></td>
-                  <td class="py-4 text-indigo-200 font-semibold text-xs tracking-widest">${trx.paymentMethod}</td>
-                  <td class="py-4 text-right font-bold ${isBatal ? 'text-rose-400 line-through' : 'text-amber-400'}">Rp ${Number(trx.total).toLocaleString('id-ID')}</td>
-                  <td class="py-4 text-center px-2 align-middle">${actionBtns}</td>
-                </tr>`;
+              filteredList.push({ trx, trxDate, isBatal });
             }
           }
         });
 
+        cachedLaporanData = filteredList;
+
         document.getElementById('rep-total-trx').innerText = totalTrx;
         document.getElementById('rep-total-rp').innerText = new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(totalRp);
-        tbody.innerHTML = htmlRows === '' ? `<tr><td colspan="6" class="text-center text-indigo-400 py-8 italic">Tidak ada transaksi pada periode tersebut.</td></tr>` : htmlRows;
+
+        renderHalamanLaporan();
       } catch (error) {
         tbody.innerHTML = `<tr><td colspan="6" class="text-center text-rose-400 py-8">Terjadi kesalahan sistem.</td></tr>`;
       }
+    }
+
+    window.renderHalamanLaporan = function() {
+      const tbody = document.getElementById('tabel-laporan-body');
+      const paginationEl = document.getElementById('laporan-pagination');
+      tbody.innerHTML = '';
+
+      if (cachedLaporanData.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-indigo-400 py-8 italic">Tidak ada transaksi pada periode tersebut.</td></tr>`;
+        paginationEl.classList.add('hidden');
+        return;
+      }
+
+      const totalPages = Math.ceil(cachedLaporanData.length / laporanLimit) || 1;
+      if (laporanPage > totalPages) laporanPage = totalPages;
+      if (laporanPage < 1) laporanPage = 1;
+
+      const startIndex = (laporanPage - 1) * laporanLimit;
+      const endIndex = startIndex + laporanLimit;
+      const pageItems = cachedLaporanData.slice(startIndex, endIndex);
+
+      let htmlRows = '';
+      pageItems.forEach(item => {
+        const { trx, trxDate, isBatal } = item;
+        const trxEncoded = encodeURIComponent(JSON.stringify(trx));
+        let actionBtns = '';
+        if(isBatal) {
+          actionBtns = `<span class="bg-rose-900/50 text-rose-300 text-[10px] px-2 py-1 rounded border border-rose-500/30 uppercase tracking-widest font-bold block text-center mb-1">DIBATALKAN</span><div class="text-[10px] text-rose-300 italic truncate w-32 mx-auto" title="${trx.cancel_reason}">Ket: ${trx.cancel_reason || '-'}</div>`;
+        } else {
+          actionBtns = `
+            <div class="flex items-center justify-center gap-2">
+              <button onclick="cetakUlang('${trxEncoded}')" title="Tampilkan E-Receipt" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition"><i class="fa-solid fa-receipt"></i></button>
+              <button onclick="konfirmasiBatalTransaksi('${trx.id}', '${trx.transactionNumber}')" title="Void/Batalkan" class="bg-rose-900/40 hover:bg-rose-800 text-rose-300 px-3 py-1.5 rounded-lg border border-indigo-500/30 transition"><i class="fa-solid fa-ban"></i></button>
+            </div>`;
+        }
+
+        htmlRows += `
+          <tr class="hover:bg-indigo-900/30 transition ${isBatal ? 'opacity-60 bg-rose-950/10' : ''}">
+            <td class="py-4 font-mono ${isBatal ? 'text-slate-400 line-through' : 'text-cyan-400'} pl-2">${trx.transactionNumber}</td>
+            <td class="py-4 text-indigo-200">${trxDate.toLocaleString('id-ID')}</td>
+            <td class="py-4 text-indigo-200"><span class="bg-indigo-950/50 border border-indigo-500/30 px-2.5 py-1 rounded-md text-xs tracking-wider">${trx.branch_id}</span></td>
+            <td class="py-4 text-indigo-200 font-semibold text-xs tracking-widest">${trx.paymentMethod}</td>
+            <td class="py-4 text-right font-bold ${isBatal ? 'text-rose-400 line-through' : 'text-amber-400'}">Rp ${Number(trx.total).toLocaleString('id-ID')}</td>
+            <td class="py-4 text-center px-2 align-middle">${actionBtns}</td>
+          </tr>`;
+      });
+
+      tbody.innerHTML = htmlRows;
+
+      document.getElementById('laporan-page-info').innerText = `Halaman ${laporanPage} dari ${totalPages}`;
+      document.getElementById('btn-laporan-prev').disabled = laporanPage <= 1;
+      document.getElementById('btn-laporan-prev').style.opacity = laporanPage <= 1 ? '0.4' : '1';
+      document.getElementById('btn-laporan-next').disabled = laporanPage >= totalPages;
+      document.getElementById('btn-laporan-next').style.opacity = laporanPage >= totalPages ? '0.4' : '1';
+      paginationEl.classList.remove('hidden');
+    }
+
+    window.gantiHalamanLaporan = function(arah) {
+      laporanPage += arah;
+      renderHalamanLaporan();
     }
     
     function initLaporanDefault() {
