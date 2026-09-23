@@ -271,17 +271,27 @@
         </div>
       </div>
 
-      <!-- TAB 5: LOG (DENGAN PAGINATION) -->
+      <!-- TAB 5: LOG (DENGAN PAGINATION NOMOR & TOMBOL LONCAT) -->
       <div id="tab-audit" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-clock-rotate-left text-cyan-400"></i>Log Sistem</h2>
         <p class="text-indigo-300 text-sm mb-6">Catatan aktivitas penting dan histori administratif sistem Coto Mario.</p>
         <div class="glass p-6 rounded-[2rem] shadow-xl">
           <div id="daftar-audit" class="space-y-3 mb-6"><p class="text-indigo-400 text-center py-6 text-sm">Memuat log...</p></div>
-          <!-- NAVIGASI PAGINATION LOG -->
-          <div id="audit-pagination" class="flex justify-between items-center border-t border-indigo-500/30 pt-4 hidden">
-            <button onclick="gantiHalamanAudit(-1)" id="btn-audit-prev" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
-            <span id="audit-page-info" class="text-xs text-indigo-300 font-medium">Halaman 1</span>
-            <button onclick="gantiHalamanAudit(1)" id="btn-audit-next" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2">Selanjutnya <i class="fa-solid fa-chevron-right"></i></button>
+          <!-- NAVIGASI PAGINATION MODERN LOG -->
+          <div id="audit-pagination" class="flex flex-wrap justify-between items-center border-t border-indigo-500/30 pt-4 gap-3 hidden">
+            <div class="flex items-center gap-1.5">
+              <button onclick="pindahHalamanAudit('first')" id="btn-audit-first" title="Halaman Awal" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angles-left"></i></button>
+              <button onclick="pindahHalamanAudit('prev')" id="btn-audit-prev" title="Sebelumnya" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angle-left"></i></button>
+            </div>
+            
+            <div id="audit-page-numbers" class="flex items-center gap-1.5 overflow-x-auto py-1">
+              <!-- Diisi dinamis oleh JS -->
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button onclick="pindahHalamanAudit('next')" id="btn-audit-next" title="Selanjutnya" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angle-right"></i></button>
+              <button onclick="pindahHalamanAudit('last')" id="btn-audit-last" title="Halaman Akhir" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angles-right"></i></button>
+            </div>
           </div>
         </div>
       </div>
@@ -356,7 +366,7 @@
         </div>
       </div>
 
-      <!-- TAB 7: LAPORAN (DENGAN PAGINATION) -->
+      <!-- TAB 7: LAPORAN (DENGAN PAGINATION NOMOR & TOMBOL LONCAT) -->
       <div id="tab-laporan" class="p-4 lg:p-8 hidden max-w-6xl mx-auto w-full h-full overflow-y-auto">
         <h2 class="text-2xl font-bold text-white mb-2 flex items-center gap-3"><i class="fa-solid fa-file-lines text-cyan-400"></i>Laporan Penjualan</h2>
         <p class="text-indigo-300 text-sm mb-6">Filter dan analisis data transaksi historis untuk seluruh cabang.</p>
@@ -409,11 +419,21 @@
               <tr><td colspan="6" class="text-center text-indigo-400 py-8">Memuat data laporan...</td></tr>
             </tbody>
           </table>
-          <!-- NAVIGASI PAGINATION LAPORAN -->
-          <div id="laporan-pagination" class="flex justify-between items-center border-t border-indigo-500/30 pt-4 mt-4 hidden">
-            <button onclick="gantiHalamanLaporan(-1)" id="btn-laporan-prev" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2"><i class="fa-solid fa-chevron-left"></i> Sebelumnya</button>
-            <span id="laporan-page-info" class="text-xs text-indigo-300 font-medium">Halaman 1</span>
-            <button onclick="gantiHalamanLaporan(1)" id="btn-laporan-next" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 px-4 py-2 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center gap-2">Selanjutnya <i class="fa-solid fa-chevron-right"></i></button>
+          <!-- NAVIGASI PAGINATION MODERN LAPORAN -->
+          <div id="laporan-pagination" class="flex flex-wrap justify-between items-center border-t border-indigo-500/30 pt-4 mt-4 gap-3 hidden">
+            <div class="flex items-center gap-1.5">
+              <button onclick="pindahHalamanLaporan('first')" id="btn-laporan-first" title="Halaman Awal" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angles-left"></i></button>
+              <button onclick="pindahHalamanLaporan('prev')" id="btn-laporan-prev" title="Sebelumnya" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angle-left"></i></button>
+            </div>
+            
+            <div id="laporan-page-numbers" class="flex items-center gap-1.5 overflow-x-auto py-1">
+              <!-- Diisi dinamis oleh JS -->
+            </div>
+
+            <div class="flex items-center gap-1.5">
+              <button onclick="pindahHalamanLaporan('next')" id="btn-laporan-next" title="Selanjutnya" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angle-right"></i></button>
+              <button onclick="pindahHalamanLaporan('last')" id="btn-laporan-last" title="Halaman Akhir" class="bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 w-9 h-9 rounded-xl text-xs font-bold border border-indigo-500/30 transition flex items-center justify-center"><i class="fa-solid fa-angles-right"></i></button>
+            </div>
           </div>
         </div>
       </div>
@@ -593,7 +613,7 @@
     window.metodePilih = 'TUNAI';
     window.posCabangAktif = null;
 
-    // State Pagination Log & Laporan
+    // State Pagination Modern Log & Laporan
     let auditPage = 1;
     const auditLimit = 20;
 
@@ -915,7 +935,7 @@
       window.daftarCabangCache.forEach(b => { if (b.code !== 'ALL') select.innerHTML += `<option value="${b.code}">${b.name}</option>`; });
     }
 
-    // LOG Sিস্টem DENGAN PAGINATION AMAN
+    // LOG SISTEM DENGAN NOMOR HALAMAN DINAMIS & TOMBOL LONCAT
     async function muatAuditTrail() {
       const divAudit = document.getElementById('daftar-audit'); 
       const paginationEl = document.getElementById('audit-pagination');
@@ -949,20 +969,23 @@
           </div>`;
       });
 
-      // Atur Tampilan Tombol Pagination Log
       const totalPages = Math.ceil((count || 0) / auditLimit) || 1;
-      document.getElementById('audit-page-info').innerText = `Halaman ${auditPage} dari ${totalPages}`;
-      document.getElementById('btn-audit-prev').disabled = auditPage <= 1;
-      document.getElementById('btn-audit-prev').style.opacity = auditPage <= 1 ? '0.4' : '1';
-      document.getElementById('btn-audit-next').disabled = auditPage >= totalPages;
-      document.getElementById('btn-audit-next').style.opacity = auditPage >= totalPages ? '0.4' : '1';
+      renderNomorHalamanPagination('audit', auditPage, totalPages);
       paginationEl.classList.remove('hidden');
     }
 
-    window.gantiHalamanAudit = function(arah) {
-      auditPage += arah;
-      if (auditPage < 1) auditPage = 1;
-      muatAuditTrail();
+    window.pindahHalamanAudit = function(target) {
+      const totalPages = Math.ceil(window.auditTotalCount || 1) || 1; // Diambil dari state dinamis
+      // Hitung ulang total pages dengan query head jika perlu, atau gunakan logic sederhana:
+      supabaseClient.from('auditlogs').select('*', { count: 'exact', head: true }).then(({ count }) => {
+        const tPages = Math.ceil((count || 0) / auditLimit) || 1;
+        if (target === 'first') auditPage = 1;
+        else if (target === 'prev') auditPage = Math.max(1, auditPage - 1);
+        else if (target === 'next') auditPage = Math.min(tPages, auditPage + 1);
+        else if (target === 'last') auditPage = tPages;
+        else if (typeof target === 'number') auditPage = target;
+        muatAuditTrail();
+      });
     }
 
     async function muatDaftarAkun() {
@@ -1524,7 +1547,33 @@
       }
     }
 
-    // LAPORAN PENJUALAN DENGAN PAGINATION AMAN
+    // FUNGSI RENDER TOMBOL NOMOR HALAMAN INTERAKTIF (PAGINATION GENERATOR)
+    function renderNomorHalamanPagination(type, currentPage, totalPages) {
+      const containerId = type === 'audit' ? 'audit-page-numbers' : 'laporan-page-numbers';
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      container.innerHTML = '';
+
+      // Tentukan rentang nomor halaman yang tampil di tengah (maksimal 5 nomor aktif agar rapi di HP)
+      let startPage = Math.max(1, currentPage - 2);
+      let endPage = Math.min(totalPages, startPage + 4);
+      if (endPage - startPage < 4) {
+        startPage = Math.max(1, endPage - 4);
+      }
+
+      for (let i = startPage; i <= endPage; i++) {
+        const isActive = i === currentPage;
+        const btnClass = isActive 
+          ? "bg-cyan-600 text-white border-cyan-400 shadow-[0_0_10px_rgba(34,211,238,0.4)]" 
+          : "bg-indigo-900/50 hover:bg-indigo-800 text-indigo-200 border-indigo-500/30";
+        
+        container.innerHTML += `
+          <button onclick="pindahHalaman${type === 'audit' ? 'Audit' : 'Laporan'}(${i})" class="w-9 h-9 rounded-xl text-xs font-bold border transition flex items-center justify-center ${btnClass}">${i}</button>
+        `;
+      }
+    }
+
+    // LAPORAN PENJUALAN DENGAN PAGINATION NOMOR & TOMBOL LONCAT
     window.resetDanFilterLaporan = function() {
       laporanPage = 1;
       jalankanFilterLaporan();
@@ -1622,16 +1671,17 @@
 
       tbody.innerHTML = htmlRows;
 
-      document.getElementById('laporan-page-info').innerText = `Halaman ${laporanPage} dari ${totalPages}`;
-      document.getElementById('btn-laporan-prev').disabled = laporanPage <= 1;
-      document.getElementById('btn-laporan-prev').style.opacity = laporanPage <= 1 ? '0.4' : '1';
-      document.getElementById('btn-laporan-next').disabled = laporanPage >= totalPages;
-      document.getElementById('btn-laporan-next').style.opacity = laporanPage >= totalPages ? '0.4' : '1';
+      renderNomorHalamanPagination('laporan', laporanPage, totalPages);
       paginationEl.classList.remove('hidden');
     }
 
-    window.gantiHalamanLaporan = function(arah) {
-      laporanPage += arah;
+    window.pindahHalamanLaporan = function(target) {
+      const totalPages = Math.ceil(cachedLaporanData.length / laporanLimit) || 1;
+      if (target === 'first') laporanPage = 1;
+      else if (target === 'prev') laporanPage = Math.max(1, laporanPage - 1);
+      else if (target === 'next') laporanPage = Math.min(totalPages, laporanPage + 1);
+      else if (target === 'last') laporanPage = totalPages;
+      else if (typeof target === 'number') laporanPage = target;
       renderHalamanLaporan();
     }
     
