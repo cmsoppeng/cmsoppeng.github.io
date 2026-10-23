@@ -1591,27 +1591,34 @@
       paginationEl.classList.add('hidden');
 
       try {
-        const { data, error } = await supabaseClient.from('transactions').select('*').order('created_at', { ascending: false });
+        // PERBAIKAN UTAMA: Filter langsung di level server Supabase berdasarkan rentang tanggal
+        let query = supabaseClient.from('transactions')
+          .select('*')
+          .gte('created_at', `${tglMulai}T00:00:00`)
+          .lte('created_at', `${tglSelesai}T23:59:59`)
+          .order('created_at', { ascending: false });
+
+        if (cabang && cabang !== 'ALL') {
+          query = query.eq('branch_id', cabang);
+        }
+
+        const { data, error } = await query;
         if (error) throw error;
 
         let filteredList = [];
         let totalTrx = 0; let totalRp = 0; 
-        const start = new Date(tglMulai + "T00:00:00"); 
-        const end = new Date(tglSelesai + "T23:59:59");
 
-        data.forEach(trx => {
-          const trxDate = new Date(trx.created_at);
-          if(trxDate >= start && trxDate <= end) {
-            const trxBranch = (trx.branch_id || 'SOP').trim().toUpperCase();
-            const filterBranch = (cabang || 'ALL').trim().toUpperCase();
-
-            if(filterBranch === 'ALL' || trxBranch === filterBranch) {
-              const isBatal = trx.status === 'CANCELLED';
-              if(!isBatal) { totalTrx += 1; totalRp += Number(trx.total || 0); }
-              filteredList.push({ trx, trxDate, isBatal });
+        if (data) {
+          data.forEach(trx => {
+            const trxDate = new Date(trx.created_at);
+            const isBatal = trx.status === 'CANCELLED';
+            if(!isBatal) { 
+              totalTrx += 1; 
+              totalRp += Number(trx.total || 0); 
             }
-          }
-        });
+            filteredList.push({ trx, trxDate, isBatal });
+          });
+        }
 
         cachedLaporanData = filteredList;
 
@@ -1620,7 +1627,7 @@
 
         renderHalamanLaporan();
       } catch (error) {
-        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-rose-400 py-8">Terjadi kesalahan sistem.</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" class="text-center text-rose-400 py-8">Terjadi kesalahan sistem: ${error.message}</td></tr>`;
       }
     }
 
@@ -1712,120 +1719,126 @@
         dateInput.value = localISODate;
       }
 
-      const targetDateStr = new Date(dateInput.value).toDateString();
+      const selectedDate = dateInput.value; // Format: 'YYYY-MM-DD'
 
-      const { data, error } = await supabaseClient
-        .from('transactions')
-        .select('*')
-        .eq('status', 'COMPLETED')
-        .order('created_at', { ascending: false });
+      try {
+        // PERBAIKAN: Hanya tarik data khusus untuk tanggal yang dipilih dari server Supabase
+        const { data, error } = await supabaseClient
+          .from('transactions')
+          .select('*')
+          .eq('status', 'COMPLETED')
+          .gte('created_at', `${selectedDate}T00:00:00`)
+          .lte('created_at', `${selectedDate}T23:59:59`)
+          .order('created_at', { ascending: false });
+          
+        if (error) throw error;
+
+        let totalRP = 0, totalTrx = 0, totalCoto = 0;
+        let mTunai = 0, mQris = 0, mTransfer = 0;
+        let branchStats = {};
         
-      if (error || !data) return;
-
-      let totalRP = 0, totalTrx = 0, totalCoto = 0;
-      let mTunai = 0, mQris = 0, mTransfer = 0;
-      let branchStats = {};
-      
-      let listCabangAktif = window.daftarCabangCache.filter(b => b.code !== 'ALL');
-      if(listCabangAktif.length === 0) {
-        listCabangAktif = [{code: 'SOP', name: 'Soppeng'}, {code: 'TAK', name: 'Takalala'}];
-      }
-      listCabangAktif.forEach(c => {
-         branchStats[c.code] = { name: c.name, rp: 0, trx: 0, coto: 0, tunai: 0, qris: 0, transfer: 0 };
-      });
-
-      data.forEach(trx => {
-        const trxDate = trx.created_at ? new Date(trx.created_at).toDateString() : new Date().toDateString();
-        
-        if(trxDate === targetDateStr) {
-          const bId = (trx.branch_id || 'SOP').trim().toUpperCase();
-          const nominal = Number(trx.total || 0);
-          const pMethod = trx.paymentMethod || 'TUNAI';
-          
-          let cotoQty = 0;
-          if(trx.items && Array.isArray(trx.items)) {
-             trx.items.forEach(item => {
-                const iName = (item.name || '').toLowerCase();
-                const iCat = (item.category || '').toLowerCase();
-                if(iName.includes('coto') || iCat.includes('coto')) {
-                   cotoQty += (item.qty || 0);
-                }
-             });
-          }
-
-          if(!branchStats[bId]) {
-            branchStats[bId] = { name: bId, rp: 0, trx: 0, coto: 0, tunai: 0, qris: 0, transfer: 0 };
-          }
-          
-          branchStats[bId].rp += nominal;
-          branchStats[bId].trx += 1;
-          branchStats[bId].coto += cotoQty;
-          
-          if(pMethod === 'TUNAI') branchStats[bId].tunai += nominal;
-          if(pMethod === 'QRIS') branchStats[bId].qris += nominal;
-          if(pMethod === 'TRANSFER') branchStats[bId].transfer += nominal;
-
-          totalRP += nominal;
-          totalTrx += 1;
-          totalCoto += cotoQty;
-          if(pMethod === 'TUNAI') mTunai += nominal;
-          if(pMethod === 'QRIS') mQris += nominal;
-          if(pMethod === 'TRANSFER') mTransfer += nominal;
+        let listCabangAktif = window.daftarCabangCache.filter(b => b.code !== 'ALL');
+        if(listCabangAktif.length === 0) {
+          listCabangAktif = [{code: 'SOP', name: 'Soppeng'}, {code: 'TAK', name: 'Takalala'}];
         }
-      });
+        listCabangAktif.forEach(c => {
+           branchStats[c.code] = { name: c.name, rp: 0, trx: 0, coto: 0, tunai: 0, qris: 0, transfer: 0 };
+        });
 
-      const fmt = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+        if (data) {
+          data.forEach(trx => {
+            const bId = (trx.branch_id || 'SOP').trim().toUpperCase();
+            const nominal = Number(trx.total || 0);
+            const pMethod = trx.paymentMethod || 'TUNAI';
+            
+            let cotoQty = 0;
+            if(trx.items && Array.isArray(trx.items)) {
+               trx.items.forEach(item => {
+                  const iName = (item.name || '').toLowerCase();
+                  const iCat = (item.category || '').toLowerCase();
+                  if(iName.includes('coto') || iCat.includes('coto')) {
+                     cotoQty += (item.qty || 0);
+                  }
+               });
+            }
 
-      document.getElementById('dash-total-rp').innerText = fmt(totalRP);
-      document.getElementById('dash-total-trx').innerText = totalTrx;
-      document.getElementById('dash-total-coto').innerText = totalCoto;
-      document.getElementById('dash-metode-tunai').innerText = fmt(mTunai);
-      document.getElementById('dash-metode-qris').innerText = fmt(mQris);
-      document.getElementById('dash-metode-transfer').innerText = fmt(mTransfer);
+            if(!branchStats[bId]) {
+              branchStats[bId] = { name: bId, rp: 0, trx: 0, coto: 0, tunai: 0, qris: 0, transfer: 0 };
+            }
+            
+            branchStats[bId].rp += nominal;
+            branchStats[bId].trx += 1;
+            branchStats[bId].coto += cotoQty;
+            
+            if(pMethod === 'TUNAI') branchStats[bId].tunai += nominal;
+            if(pMethod === 'QRIS') branchStats[bId].qris += nominal;
+            if(pMethod === 'TRANSFER') branchStats[bId].transfer += nominal;
 
-      let htmlCabang = '';
-      Object.keys(branchStats).forEach(kode => {
-         const b = branchStats[kode];
-         htmlCabang += `
-            <div class="glass p-6 rounded-[1.5rem] shadow-xl relative overflow-hidden flex flex-col mb-4 bg-indigo-950/40 border border-indigo-500/30">
-               <div class="absolute left-0 top-6 bottom-6 w-1.5 bg-amber-500 rounded-r-md opacity-80"></div>
-               
-               <div class="pl-4">
-                 <div class="flex justify-between items-center mb-5 border-b border-indigo-500/30 pb-4">
-                    <h4 class="text-xl font-bold text-white tracking-wide">${b.name}</h4>
-                    <span class="text-xl font-bold text-amber-400 drop-shadow-md">${fmt(b.rp)}</span>
-                 </div>
+            totalRP += nominal;
+            totalTrx += 1;
+            totalCoto += cotoQty;
+            if(pMethod === 'TUNAI') mTunai += nominal;
+            if(pMethod === 'QRIS') mQris += nominal;
+            if(pMethod === 'TRANSFER') mTransfer += nominal;
+          });
+        }
+
+        const fmt = (val) => new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(val);
+
+        document.getElementById('dash-total-rp').innerText = fmt(totalRP);
+        document.getElementById('dash-total-trx').innerText = totalTrx;
+        document.getElementById('dash-total-coto').innerText = totalCoto;
+        document.getElementById('dash-metode-tunai').innerText = fmt(mTunai);
+        document.getElementById('dash-metode-qris').innerText = fmt(mQris);
+        document.getElementById('dash-metode-transfer').innerText = fmt(mTransfer);
+
+        let htmlCabang = '';
+        Object.keys(branchStats).forEach(kode => {
+           const b = branchStats[kode];
+           htmlCabang += `
+              <div class="glass p-6 rounded-[1.5rem] shadow-xl relative overflow-hidden flex flex-col mb-4 bg-indigo-950/40 border border-indigo-500/30">
+                 <div class="absolute left-0 top-6 bottom-6 w-1.5 bg-amber-500 rounded-r-md opacity-80"></div>
                  
-                 <div class="space-y-3 mb-5 border-b border-indigo-500/30 pb-4">
-                    <div class="flex justify-between items-center">
-                       <span class="text-cyan-400 font-bold tracking-wider uppercase text-[11px]">Total Transaksi</span>
-                       <span class="text-white font-bold text-sm">${b.trx} <span class="text-indigo-400 font-normal text-xs ml-0.5">TX</span></span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                       <span class="text-cyan-400 font-bold tracking-wider uppercase text-[11px]">Coto Terjual</span>
-                       <span class="text-white font-bold text-sm">${b.coto} <span class="text-indigo-400 font-normal text-xs ml-0.5">PORSI</span></span>
-                    </div>
+                 <div class="pl-4">
+                   <div class="flex justify-between items-center mb-5 border-b border-indigo-500/30 pb-4">
+                      <h4 class="text-xl font-bold text-white tracking-wide">${b.name}</h4>
+                      <span class="text-xl font-bold text-amber-400 drop-shadow-md">${fmt(b.rp)}</span>
+                   </div>
+                   
+                   <div class="space-y-3 mb-5 border-b border-indigo-500/30 pb-4">
+                      <div class="flex justify-between items-center">
+                         <span class="text-cyan-400 font-bold tracking-wider uppercase text-[11px]">Total Transaksi</span>
+                         <span class="text-white font-bold text-sm">${b.trx} <span class="text-indigo-400 font-normal text-xs ml-0.5">TX</span></span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                         <span class="text-cyan-400 font-bold tracking-wider uppercase text-[11px]">Coto Terjual</span>
+                         <span class="text-white font-bold text-sm">${b.coto} <span class="text-indigo-400 font-normal text-xs ml-0.5">PORSI</span></span>
+                      </div>
+                   </div>
+                   
+                   <div class="space-y-2">
+                      <div class="flex justify-between items-center">
+                         <span class="text-indigo-300 font-medium uppercase tracking-wider text-[11px]">Tunai</span>
+                         <span class="text-indigo-100 font-semibold text-xs tracking-wider">${fmt(b.tunai)}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                         <span class="text-indigo-300 font-medium uppercase tracking-wider text-[11px]">QRIS</span>
+                         <span class="text-indigo-100 font-semibold text-xs tracking-wider">${fmt(b.qris)}</span>
+                      </div>
+                      <div class="flex justify-between items-center">
+                         <span class="text-indigo-300 font-medium uppercase tracking-wider text-[11px]">Transfer</span>
+                         <span class="text-indigo-100 font-semibold text-xs tracking-wider">${fmt(b.transfer)}</span>
+                      </div>
+                   </div>
                  </div>
-                 
-                 <div class="space-y-2">
-                    <div class="flex justify-between items-center">
-                       <span class="text-indigo-300 font-medium uppercase tracking-wider text-[11px]">Tunai</span>
-                       <span class="text-indigo-100 font-semibold text-xs tracking-wider">${fmt(b.tunai)}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                       <span class="text-indigo-300 font-medium uppercase tracking-wider text-[11px]">QRIS</span>
-                       <span class="text-indigo-100 font-semibold text-xs tracking-wider">${fmt(b.qris)}</span>
-                    </div>
-                    <div class="flex justify-between items-center">
-                       <span class="text-indigo-300 font-medium uppercase tracking-wider text-[11px]">Transfer</span>
-                       <span class="text-indigo-100 font-semibold text-xs tracking-wider">${fmt(b.transfer)}</span>
-                    </div>
-                 </div>
-               </div>
-            </div>
-         `;
-      });
-      document.getElementById('dash-cabang-list').innerHTML = htmlCabang;
+              </div>
+           `;
+        });
+        document.getElementById('dash-cabang-list').innerHTML = htmlCabang;
+
+      } catch (err) {
+        console.error("Gagal memuat dashboard:", err);
+      }
     }
   </script>
 </body>
